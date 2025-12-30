@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ServiceSpot - Discover Reliable Local Services</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="main-container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">ServiceSpot</div>
+                <nav class="nav">
+                    <a href="index.html" class="nav-link active">Home</a>
+                    <a href="register.html" class="nav-link">Register</a>
+                    <a href="login.html" class="nav-link">Login</a>
+                    <a href="aboutus.html" class="nav-link">About Us</a>
+                </nav>
+            </div>
+        </header>
+
+        <section class="carousel-section">
+            <div class="carousel-container">
+                <div class="carousel-wrapper">
+                    <div class="carousel-slide active">
+                        <div class="slide-content">
+                            <h2>Discover Reliable Services</h2>
+                            <p>Find trusted professionals in your area instantly</p>
+                            <button class="cta-button">Get Started</button>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div class="slide-content">
+                            <h2>Your Gateway to Success</h2>
+                            <p>Seamless service discovery and booking made easy</p>
+                            <button class="cta-button">Explore Now</button>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div class="slide-content">
+                            <h2>Connect & Grow</h2>
+                            <p>Build trust with verified service providers</p>
+                            <button class="cta-button">Join Community</button>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div class="slide-content">
+                            <h2>Quality Guaranteed</h2>
+                            <p>Experience exceptional service quality every time</p>
+                            <button class="cta-button">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="carousel-btn prev" onclick="changeSlide(-1)">❮</button>
+                <button class="carousel-btn next" onclick="changeSlide(1)">❯</button>
+
+                <div class="carousel-dots">
+                    <span class="dot active" onclick="currentSlide(0)"></span>
+                    <span class="dot" onclick="currentSlide(1)"></span>
+                    <span class="dot" onclick="currentSlide(2)"></span>
+                    <span class="dot" onclick="currentSlide(3)"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="welcome-section">
+            <div class="welcome-content">
+                <h1>Welcome to ServiceSpot</h1>
+                <p class="tagline">Your one-stop destination for finding reliable local services near you!</p>
+                <p class="description">We are dedicated to connecting service seekers with trusted professionals in various categories. Whether you need home repair, personal grooming, or professional services, ServiceSpot brings you the best options right at your fingertips.</p>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>All rights reserved &copy; 2025 ServiceSpot</p>
+        </footer>
+    </div>
+
+    <script src="/js/carousel.js"></script>
+</body>
+</html>

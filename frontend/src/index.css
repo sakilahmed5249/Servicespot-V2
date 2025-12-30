@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 rgb(13, 138, 192);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+  }
+}
+
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes gradient-shimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes subtle-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+:root {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8F9FF;
+  --bg-tertiary: #EFF0FF;
+  --text-primary: #0A0E27;
+  --text-muted: #6B7280;
+  --text-light: #9CA3AF;
+  
+  /* Vibrant Primary Colors */
+  --accent: #6366F1;
+  --accent-dark: #4F46E5;
+  --accent-light: #818CF8;
+  --accent-soft: #E0E7FF;
+  
+  /* Vibrant Secondary Colors */
+  --secondary: #EC4899;
+  --secondary-dark: #BE185D;
+  --secondary-light: #F472B6;
+  
+  /* Vibrant Tertiary Colors */
+  --tertiary: #F97316;
+  --tertiary-dark: #D97706;
+  --tertiary-light: #FB923C;
+  
+  /* Success & Status Colors */
+  --success: #10B981;
+  --success-light: #D1FAE5;
+  --warning: #F59E0B;
+  --warning-light: #FEF3C7;
+  --error: #EF4444;
+  --error-light: #FEE2E2;
+  
+  /* Cyan & Teal */
+  --cyan: #06B6D4;
+  --teal: #14B8A6;
+  
+  /* Enhanced Backgrounds & Shadows */
+  --card-bg: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%);
+  --card-shadow: 0 12px 40px rgba(99, 102, 241, 0.15);
+  --glow-shadow: 0 8px 32px rgba(236, 72, 153, 0.2);
+  --border-color: rgba(99, 102, 241, 0.2);
+  --border-secondary: rgba(168, 85, 247, 0.15);
+  
+  scroll-behavior: smooth;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Space Grotesk', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #FFFFFF;
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  font-family: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+main {
+  flex: 1;
+}
+
+.section-shell {
+  width: min(1200px, 90vw);
+  margin: 0 auto;
+}

@@ -1,0 +1,157 @@
+.admin-dashboard-container {
+  padding: 30px;
+  text-align: center;
+}
+
+.admin-dashboard-container h1 {
+  color: #0A4D68;
+  margin-bottom: 30px;
+}
+
+/* Cards */
+.dashboard-cards {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  flex-wrap: wrap;
+}
+
+.card {
+  width: 220px;
+  padding: 20px;
+  background: #f8f8f8;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+}
+
+.card h3 {
+  font-size: 32px;
+  margin: 10px 0;
+  color: #0A4D68;
+}
+
+.card p {
+  font-size: 16px;
+  color: #444;
+}
+
+.admin-actions {
+  margin-top: 40px;
+}
+
+.admin-actions button {
+  padding: 12px 25px;
+  margin: 10px;
+  background: #0A4D68;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  border-radius: 6px;
+}
+
+.admin-actions button:hover {
+  background: #08384e;
+}
+
+.unsolved-messages-section {
+  margin-top: 50px;
+  padding: 30px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.unsolved-messages-section h2 {
+  color: #0A4D68;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.messages-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.message-preview-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #ff9800;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.3s ease;
+}
+
+.message-preview-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.message-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.message-preview-header h4 {
+  color: #0A4D68;
+  margin: 0;
+  flex: 1;
+}
+
+.message-date {
+  font-size: 12px;
+  color: #999;
+  white-space: nowrap;
+}
+
+.message-preview-content {
+  flex: 1;
+  margin-bottom: 15px;
+}
+
+.message-preview-content p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.message-sender {
+  font-size: 13px !important;
+  color: #0A4D68 !important;
+}
+
+.message-phone {
+  font-size: 13px !important;
+  color: #666 !important;
+}
+
+.message-text {
+  color: #666;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+
+.view-details-btn {
+  background: #ff9800;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.3s ease;
+}
+
+.view-details-btn:hover {
+  background: #e68900;
+}

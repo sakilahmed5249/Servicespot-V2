@@ -1,0 +1,299 @@
+/* -------------------------------------------------------------
+   NAVBAR ANIMATIONS
+------------------------------------------------------------- */
+@keyframes navReveal {
+  0% { opacity: 0; transform: translateY(-20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* -------------------------------------------------------------
+   NAVBAR MAIN CONTAINER
+------------------------------------------------------------- */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1200;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px clamp(20px, 5vw, 64px);
+
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+  backdrop-filter: blur(12px);
+
+  animation: navReveal 0.4s ease-out;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.05);
+}
+
+/* -------------------------------------------------------------
+   LOGO
+------------------------------------------------------------- */
+.navbar-left .logo {
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 800;
+
+  background: linear-gradient(135deg, #6366F1, #EC4899);
+  -webkit-background-clip: text;
+  color: transparent;
+
+  letter-spacing: 0.04em;
+}
+
+.navbar-left .logo span {
+  background: linear-gradient(135deg, #F97316, #06B6D4);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* -------------------------------------------------------------
+   SEARCH BOX
+------------------------------------------------------------- */
+.navbar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.navbar-search {
+  max-width: 480px;
+  width: 100%;
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  padding: 10px 18px 10px 44px;
+
+  border-radius: 12px;
+  background: #FFFFFF;
+
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.15);
+
+  transition: 0.25s ease;
+}
+
+.navbar-search:hover,
+.navbar-search:focus-within {
+  border-color: #6366F1;
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
+}
+
+.navbar-search input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: #0F172A;
+}
+
+.navbar-search input::placeholder {
+  color: #64748B;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 16px;
+  background: linear-gradient(135deg, #6366F1, #EC4899);
+  -webkit-background-clip: text;
+  color: transparent;
+  pointer-events: none;
+  font-weight: 700;
+}
+
+/* SEARCH DROPDOWN */
+.dropdown {
+  width: 100%;
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+
+  background: #FFFFFF;
+  border: 2px solid rgba(99, 102, 241, 0.2);
+  border-radius: 12px;
+
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+
+  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.25);
+}
+
+.dropdown li {
+  padding: 12px 18px;
+  cursor: pointer;
+  color: #0A0E27;
+  transition: 0.2s;
+}
+
+.dropdown li:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+  color: #6366F1;
+  border-left: 3px solid #EC4899;
+  padding-left: 15px;
+}
+
+/* SEARCH DROPDOWN LIST */
+.dropdown-list {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  width: 100%;
+  
+  background: #FFFFFF;
+  border: 2px solid rgba(99, 102, 241, 0.2);
+  border-radius: 12px;
+  
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: 1300;
+  
+  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.25);
+  margin-top: 8px;
+}
+
+.dropdown-item {
+  padding: 12px 18px;
+  cursor: pointer;
+  color: #0A0E27;
+  font-size: 14px;
+  font-weight: 600;
+  
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.dropdown-item:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+  color: #EC4899;
+  border-left-color: #6366F1;
+  padding-left: 20px;
+}
+
+.dropdown-loading {
+  padding: 16px 18px;
+  text-align: center;
+  color: #64748B;
+  font-size: 13px;
+}
+
+.dropdown-no-results {
+  padding: 16px 18px;
+  text-align: center;
+  color: #94A3B8;
+  font-size: 13px;
+}
+
+/* -------------------------------------------------------------
+   NAV LINKS
+------------------------------------------------------------- */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 16px;
+  list-style: none;
+}
+
+.nav-links li a {
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 700;
+
+  color: #0A0E27;
+  background: #FFFFFF;
+
+  border-radius: 10px;
+  border: 2px solid rgba(99, 102, 241, 0.2);
+
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+
+  transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-links li a:hover {
+  background: linear-gradient(135deg, #0EA5E9, #06B6D4);
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(6, 182, 212, 0.35);
+  border-color: transparent;
+}
+
+/* -------------------------------------------------------------
+   LOGOUT BUTTON
+------------------------------------------------------------- */
+.logout-btn {
+  padding: 8px 20px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
+
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
+}
+
+.logout-btn:active {
+  transform: scale(0.96);
+}
+
+/* -------------------------------------------------------------
+   RESPONSIVE
+------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .navbar {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .navbar-center {
+    width: 100%;
+    order: 3;
+  }
+
+  .navbar-right {
+    width: 100%;
+    order: 2;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .navbar {
+    padding: 14px 18px;
+  }
+
+  .navbar-right {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .navbar-search {
+    max-width: 100%;
+  }
+}

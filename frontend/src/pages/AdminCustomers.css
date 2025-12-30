@@ -1,0 +1,89 @@
+.admin-customers-container {
+  padding: 30px;
+}
+
+.admin-customers-container h1 {
+  text-align: center;
+  color: #0A4D68;
+  margin-bottom: 30px;
+}
+
+/* Search */
+.customer-search-box {
+  width: 300px;
+  margin: 0 auto 20px auto;
+  position: relative;
+}
+
+.customer-search-box input {
+  width: 100%;
+  padding: 10px 15px 10px 35px;
+  border-radius: 20px;
+  border: 1px solid gray;
+  outline: none;
+}
+
+.customer-search-box .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: gray;
+}
+
+/* Table */
+.customer-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.customer-table th,
+.customer-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.customer-table th {
+  background: #0A4D68;
+  color: white;
+}
+
+/* Status Badges */
+.verified {
+  color: green;
+  font-weight: bold;
+}
+
+.unverified {
+  color: red;
+  font-weight: bold;
+}
+
+/* Buttons */
+.verify-btn {
+  padding: 8px 15px;
+  background: green;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.unverify-btn {
+  padding: 8px 15px;
+  background: #b30000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.verify-btn:hover {
+  background: darkgreen;
+}
+
+.unverify-btn:hover {
+  background: #800000;
+}
