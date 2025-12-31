@@ -1,416 +1,254 @@
-# ServiceSpot - Professional Service Booking Platform
+<p align="center">
+  <h1 align="center">🔧 QuickServe</h1>
+  <p align="center">
+    <strong>Localized Service Discovery & Booking Platform</strong>
+  </p>
+  <p align="center">
+    A modern full-stack application connecting customers with verified service professionals
+  </p>
+</p>
 
-A modern, full-stack web application that connects customers with verified service professionals. Built with **React**, **Spring Boot**, and **MySQL**, ServiceSpot streamlines the process of finding, comparing, and booking trusted service providers.
-
----
-
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Installation & Setup](#installation--setup)
-- [Running the Application](#running-the-application)
-- [Project Structure](#project-structure)
-- [API Endpoints](#api-endpoints)
-- [Database Schema](#database-schema)
-- [Key Features Explained](#key-features-explained)
-- [Contributing](#contributing)
+<p align="center">
+  <img src="https://img.shields.io/badge/Spring%20Boot-3.3.4-brightgreen?style=flat-square&logo=springboot" alt="Spring Boot">
+  <img src="https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react" alt="React">
+  <img src="https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk" alt="Java">
+  <img src="https://img.shields.io/badge/MySQL-8.0-blue?style=flat-square&logo=mysql" alt="MySQL">
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="License">
+</p>
 
 ---
 
-## 🎯 Overview
+## 📖 Overview
 
-**ServiceSpot** is a comprehensive service booking platform that bridges the gap between customers needing services and skilled professionals offering them. The platform provides:
+**QuickServe** is an enterprise-grade service booking platform that seamlessly connects customers with trusted service professionals. Built with modern technologies and security best practices, it offers real-time notifications, location-based discovery, and comprehensive management tools.
 
-- **Customer-Centric Booking**: Intuitive search, filtering, and instant booking
-- **Provider Management**: Complete profile management and service listings
-- **Real-Time Location Services**: Map-based provider discovery using Leaflet
-- **Verification System**: Professional verification for trust and security
-- **Admin Dashboard**: Complete system management and monitoring
-- **Modern UI/UX**: Vibrant gradient colors, smooth animations, and responsive design
+### ✨ Highlights
 
----
-
-## ✨ Features
-
-### For Customers
-- 🔍 **Advanced Search**: Find services by name, location, and category
-- 📍 **Location-Based Discovery**: Nearby providers on interactive map
-- ⭐ **Rating & Reviews**: View provider ratings and customer feedback
-- 💳 **Secure Booking**: Book services with transparent pricing
-- 📱 **Responsive Design**: Works seamlessly on all devices
-- 📊 **Real-Time Tracking**: Monitor booking status from request to completion
-- 🔔 **Real-Time Notifications**: Instant booking updates via WebSocket
-- 📧 **OTP Verification**: Secure email verification during registration
-
-### For Service Providers
-- 📝 **Profile Management**: Complete service listings and availability
-- ✅ **Verification Process**: Get verified to build customer trust
-- 💰 **Transparent Pricing**: Set and manage service rates
-- 📈 **Performance Analytics**: Track completed jobs and customer ratings
-- 🔔 **Booking Notifications**: Real-time alerts for new requests
-- ⭐ **Review Notifications**: Instant alerts when customers leave reviews
-
-### For Administrators
-- 👥 **User Management**: Manage customers, providers, and staff
-- ✔️ **Verification Control**: Approve/reject provider verifications
-- 📊 **System Statistics**: Track platform metrics and analytics
-- 🛡️ **Content Moderation**: Monitor and manage platform content
-- 🔔 **Admin Notifications**: Alerts for new registrations and contact form submissions
+| Feature | Description |
+|---------|-------------|
+| 🗺️ **Location-Based Discovery** | Find nearby providers with interactive Leaflet maps |
+| 🔔 **Real-Time Notifications** | WebSocket-powered instant updates |
+| 🔐 **Enterprise Security** | BCrypt encryption, input validation, secure APIs |
+| 📧 **OTP Verification** | Email-based account verification |
+| ⭐ **Reviews & Ratings** | Amazon-style customer feedback system |
+| 📱 **Responsive Design** | Seamless experience across all devices |
 
 ---
 
 ## 🛠️ Tech Stack
 
+<table>
+<tr>
+<td align="center" width="50%">
+
 ### Frontend
-- **React 19.2** - Modern UI framework
-- **Vite 7.2** - Fast build tool and dev server
-- **React Router 6.30** - Client-side routing
-- **Leaflet & React-Leaflet** - Interactive mapping
-- **Axios** - HTTP client
-- **React Icons** - Icon library
-- **CSS3** - Modern styling with gradients and animations
+| Technology | Version |
+|------------|---------|
+| React | 19.2 |
+| Vite | 7.2 |
+| React Router | 6.30 |
+| Leaflet | 1.9 |
+| STOMP.js | 7.2 |
+| Axios | 1.13 |
+
+</td>
+<td align="center" width="50%">
 
 ### Backend
-- **Spring Boot 3.3.4** - Java framework
-- **Spring Data JPA** - ORM and database layer
-- **Spring WebSocket (STOMP)** - Real-time notifications
-- **MySQL** - Relational database
-- **Java 21** - Latest Java features
-- **JavaMailSender** - OTP email verification
-- **Maven** - Build automation
+| Technology | Version |
+|------------|---------|
+| Spring Boot | 3.3.4 |
+| Java | 21 |
+| Spring Security | 6.x |
+| WebSocket (STOMP) | - |
+| Jakarta Validation | - |
+| MySQL | 8.0 |
 
-### DevOps & Tools
-- **Node.js & npm** - Frontend package management
-- **Maven** - Java dependency management
-- **Git & GitHub** - Version control
-- **ESLint** - Code quality
+</td>
+</tr>
+</table>
 
 ---
 
 ## 🏗️ Architecture
 
-### Application Structure
-
 ```
-ServiceSpot/
-├── frontend/                 # React Application
+QuickServe/
+├── frontend/                          # React SPA
 │   ├── src/
-│   │   ├── components/      # Reusable UI components
-│   │   ├── pages/           # Route pages
-│   │   ├── App.jsx          # Main app component
-│   │   └── index.css        # Global styles
-│   ├── package.json
-│   └── vite.config.js
+│   │   ├── components/               # Reusable UI components
+│   │   ├── pages/                    # Route pages
+│   │   ├── context/                  # React Context (Auth, Notifications)
+│   │   └── App.jsx                   # Main application
+│   └── package.json
 │
-├── backend/                  # Spring Boot Application
-│   ├── src/main/java/Team/C/Service/Spot/
-│   │   ├── controller/      # REST API endpoints
-│   │   ├── services/        # Business logic
-│   │   ├── model/           # Entity models
-│   │   ├── repositery/      # Database access
-│   │   └── Application.java # Entry point
-│   ├── pom.xml
-│   └── application.properties
+├── backend/                           # Spring Boot API
+│   ├── src/main/java/.../
+│   │   ├── controller/               # REST endpoints
+│   │   ├── service/                  # Business logic
+│   │   │   ├── interfaces/           # Service contracts
+│   │   │   └── impl/                 # Implementations
+│   │   ├── dto/                      # Data Transfer Objects
+│   │   │   ├── customer/             # Customer DTOs
+│   │   │   └── provider/             # Provider DTOs
+│   │   ├── mapper/                   # Entity-DTO mappers
+│   │   ├── model/                    # JPA entities
+│   │   ├── repositery/               # Data access layer
+│   │   ├── exception/                # Custom exceptions
+│   │   ├── security/                 # Security config
+│   │   └── config/                   # App configuration
+│   └── pom.xml
 │
-└── README.md               # This file
+└── docs/                              # Documentation
 ```
 
 ---
 
-## 💻 Installation & Setup
+## 🚀 Quick Start
 
 ### Prerequisites
-- **Java 21+** installed and configured
-- **Node.js 16+** and npm
-- **MySQL 8+** running locally
-- **Maven** installed
-- **Git** for version control
+- Java 21+
+- Node.js 18+
+- MySQL 8.0+
+- Maven 3.9+
 
-### Backend Setup
+### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/service-spot.git
-   cd service-spot/backend
-   ```
-
-2. **Configure MySQL**
-   - Create a new MySQL database: `servicespot`
-   - Update `application.properties` with your credentials:
-   ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/servicespot
-   spring.datasource.username=yourusername
-   spring.datasource.password=yourpassword
-   spring.jpa.hibernate.ddl-auto=update
-   ```
-
-3. **Build the project**
-   ```bash
-   mvn clean install
-   ```
-
-4. **Run the backend server**
-   ```bash
-   mvn spring-boot:run
-   ```
-   Backend runs on: **http://localhost:8080**
-
-### Frontend Setup
-
-1. **Navigate to frontend directory**
-   ```bash
-   cd ../frontend
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Create `.env` file** (if needed)
-   ```env
-   VITE_API_URL=http://localhost:8080
-   ```
-
-4. **Run development server**
-   ```bash
-   npm run dev
-   ```
-   Frontend runs on: **http://localhost:5173**
-
----
-
-## 🚀 Running the Application
-
-### Start Backend (Terminal 1)
 ```bash
+# Clone repository
+git clone https://github.com/your-org/quickserve.git
+cd quickserve
+
+# Backend setup
 cd backend
+mvn clean install
 mvn spring-boot:run
-```
 
-### Start Frontend (Terminal 2)
-```bash
+# Frontend setup (new terminal)
 cd frontend
+npm install
 npm run dev
 ```
 
-### Build for Production
+### Access Points
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:8080 |
+| WebSocket | ws://localhost:8080/ws-notifications |
 
-**Frontend**
-```bash
-npm run build
-npm run preview
+---
+
+## 🔐 Security Architecture
+
+### Password Security
+- **BCrypt Hashing** — Industry-standard encryption (strength 10)
+- **Zero Exposure** — Passwords never returned in API responses
+- **Secure Change Flow** — Current password verification required
+
+### Input Validation
+```java
+@NotBlank(message = "Email is required")
+@Email(message = "Invalid email format")
+private String email;
+
+@Size(min = 8, message = "Password must be 8+ characters")
+@Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).*$")
+private String password;
 ```
 
-**Backend**
-```bash
-mvn clean package
-java -jar target/Service-Spot-0.0.1-SNAPSHOT.jar
-```
+### Exception Handling
+| Exception | HTTP Code | Use Case |
+|-----------|-----------|----------|
+| `ResourceNotFoundException` | 404 | Entity not found |
+| `DuplicateEmailException` | 409 | Email exists |
+| `DuplicatePhoneException` | 409 | Phone exists |
+| `InvalidCredentialsException` | 401 | Auth failure |
 
 ---
 
-## 📁 Project Structure
+## 📡 API Overview
 
-### Frontend Components
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/customer/signup` | Customer registration |
+| POST | `/api/customer/login` | Customer login |
+| POST | `/api/provider/signup` | Provider registration |
+| POST | `/api/provider/login` | Provider login |
 
-| Component | Purpose |
-|-----------|---------|
-| **Navbar** | Navigation header with search integration |
-| **Search** | Service search functionality |
-| **Home** | Landing page with hero and feature highlights |
-| **SearchResults** | Filtered results with advanced filters |
-| **NearbyServices** | Map-based provider discovery |
-| **BookService** | Complete booking workflow |
-| **CustomerProfile** | Customer account management |
-| **ProviderDashboard** | Provider analytics and bookings |
-
-### Backend Endpoints
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/auth/register` | POST | User registration |
-| `/api/auth/login` | POST | User authentication |
-| `/api/providers` | GET | Get all providers |
-| `/api/providers/{id}` | GET | Get provider details |
-| `/booking` | POST | Create new booking |
-| `/booking/{id}` | GET | Get booking details |
-| `/api/search` | GET | Search services |
-| `/api/admin/statistics` | GET | Get platform statistics |
+### Core Resources
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/provider/nearby` | Location-based search |
+| POST | `/api/booking` | Create booking |
+| GET | `/api/notifications/user/{email}` | Get notifications |
+| POST | `/api/rating/create` | Submit review |
 
 ---
 
-## 🗄️ Database Schema
+## 🔔 Notification System
 
-### Main Tables
+Real-time notifications via WebSocket (STOMP protocol):
 
-**Users Table**
-- Stores customer, provider, and admin information
-- Fields: id, name, email, phone, password, role, verified, created_at
-
-**Services Table**
-- Service offerings with pricing and details
-- Fields: id, name, provider_id, category_id, price, description, rating, status
-
-**Bookings Table**
-- Booking records with status tracking
-- Fields: id, customer_id, provider_id, service_id, booking_date, status, amount
-
-**Providers Table**
-- Extended provider information
-- Fields: id, user_id, service_type, city, state, verified, price, distance
-
-**Categories Table**
-- Service categories for organization
-- Fields: id, name, description
-
-**Reviews Table**
-- Customer reviews and ratings
-- Fields: id, booking_id, rating, comment, created_at
+| Event | Recipient | Priority |
+|-------|-----------|----------|
+| Booking Created | Provider | HIGH |
+| Booking Confirmed | Customer | HIGH |
+| Booking Cancelled | Both Parties | HIGH |
+| Review Received | Provider | NORMAL |
+| New Registration | Admin | NORMAL |
 
 ---
 
-## 🎨 Key Features Explained
+## 👥 User Roles
 
-### 1. Dynamic Home Page
-- Animated metrics counters showing real-time statistics
-- Fetches data from `/api/admin/statistics` endpoint
-- Falls back to static values if backend unavailable
-- Vibrant gradient design with smooth animations
-
-### 2. Location-Based Discovery
-- Integration with Leaflet maps
-- Real-time geolocation using browser API
-- Dynamic provider filtering by distance
-- Color-coded markers for provider status
-
-### 3. Advanced Search & Filters
-- Multi-criteria filtering (service type, location, price)
-- Sorting by relevance, rating, or price
-- Live result updates with optimized performance
-- Responsive filter sidebar
-
-### 4. Booking Restrictions
-- Customers can book services
-- Providers/admins cannot book (enforcement with toast notifications)
-- Role-based access control
-- Automatic redirects for unauthorized users
-
-### 5. Role-Based Access Control
-- **Customer Role**: Can browse, search, and book services
-- **Provider Role**: Can manage services and view bookings
-- **Admin Role**: Full system access and management
-
-### 6. Modern UI/UX
-- Vibrant color scheme (Indigo, Pink, Orange)
-- Smooth animations and transitions
-- Toast notifications instead of alerts
-- Fully responsive design for all devices
+| Role | Capabilities |
+|------|-------------|
+| **Customer** | Browse, book services, leave reviews, receive notifications |
+| **Provider** | Manage profile, accept/reject bookings, view analytics |
+| **Admin** | Full system access, user verification, platform monitoring |
 
 ---
 
-## 🔐 Security Features
+## 📂 Documentation
 
-- Password encryption with BCrypt
-- OTP-based email verification for registration
-- CORS configuration for frontend-backend communication
-- Role-based authorization on API endpoints
-- XSS and CSRF protection
-- SQL injection prevention through JPA
-
----
-
-## 📊 Statistics & Metrics
-
-The platform tracks:
-- **Tasks Completed**: Total service bookings fulfilled
-- **Verified Professionals**: Number of verified providers
-- **Customer Satisfaction**: Average rating (out of 5)
-- **Active Users**: Registered customers and providers
+| Document | Description |
+|----------|-------------|
+| [Security Architecture](./Security.md) | BCrypt, DTOs, exceptions |
+| [Notification System](./NOTIFICATION_SYSTEM_README.md) | WebSocket implementation |
+| [API Reference](./NOTIFICATION_SYSTEM_DOCUMENTATION.md) | Complete API docs |
 
 ---
 
-## 🧪 Testing
+## 🗓️ Roadmap
 
-### API Testing
-PowerShell test scripts are provided in the root directory:
-```bash
-.\test_provider_signup.ps1
-.\test_customer_signup.ps1
-.\test_search.ps1
-.\test_booking.ps1
-```
-
-### Frontend Testing
-```bash
-npm run lint
-npm run build
-```
+- [ ] Payment gateway integration
+- [ ] Mobile app (React Native)
+- [ ] Advanced analytics dashboard
+- [ ] Multi-language support
+- [ ] Push notifications
 
 ---
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Commit messages clearly (`git commit -m 'Add amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
-
-### Code Standards
-- Follow existing code style
-- Write clean, readable code
-- Add comments for complex logic
-- Test before submitting PR
-- Update documentation
+2. Create feature branch (`git checkout -b feature/amazing`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing`)
+5. Open Pull Request
 
 ---
 
-## 📝 License
+## 📄 License
 
-This project is licensed under the MIT License - see LICENSE file for details.
-
----
-
-## 👥 Team
-
-ServiceSpot is developed by **Team C** as a comprehensive service booking platform.
+This project is licensed under the MIT License.
 
 ---
 
-## 📧 Support & Contact
-
-For issues, features requests, or questions:
-- Open an issue on GitHub
-- Check existing documentation in `/docs`
-- Review test files for usage examples
-
----
-
-## 🚀 Future Enhancements
-
-- Advanced analytics dashboard
-- Mobile app (React Native)
-- Push notifications for mobile devices
-- Service subscription plans
-- Rating and review moderation system
-- Payment gateway integration
-
----
-
-## 📚 Additional Resources
-
-- [Frontend README](./frontend/README.md)
-- [API Documentation](./docs/API.md)
-- [Setup Guide](./SETUP_AND_TEST.md)
-- [Testing Guide](./TESTING_GUIDE.md)
-
----
-
-**Made with ❤️ by Team C**
-
-Last Updated: December 2025
+<p align="center">
+  <strong>Built with ❤️ by Team C</strong>
+  <br>
+  <sub>QuickServe v1.3.0 • December 2025</sub>
+</p>

@@ -2,6 +2,7 @@ package Team.C.Service.Spot.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import Team.C.Service.Spot.dto.NotificationRequest;
@@ -24,6 +25,7 @@ public class ProviderController {
 
     private final ProviderService providerService;
     private final NotificationService notificationService;
+    private final PasswordEncoder passwordEncoder;
 
     private static final String ADMIN_EMAIL = "admin@servicespot.com";
 
@@ -132,6 +134,8 @@ public class ProviderController {
             }
 
             Provider provider = mapToEntity(dto);
+            // Hash password with BCrypt before saving
+            provider.setPassword(passwordEncoder.encode(dto.getPassword()));
             Provider savedProvider = providerService.signup(provider);
 
             // Notify admin about new provider registration
@@ -166,9 +170,10 @@ public class ProviderController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody ProviderDTO dto) {
-        var result = providerService.login(dto.getEmail(), dto.getPassword());
-        if (result.isPresent()) {
-            return ResponseEntity.ok(mapToDTO(result.get()));
+        var providerOpt = providerService.getProviderByEmail(dto.getEmail());
+        // Use BCrypt to verify password
+        if (providerOpt.isPresent() && passwordEncoder.matches(dto.getPassword(), providerOpt.get().getPassword())) {
+            return ResponseEntity.ok(mapToDTO(providerOpt.get()));
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
     }

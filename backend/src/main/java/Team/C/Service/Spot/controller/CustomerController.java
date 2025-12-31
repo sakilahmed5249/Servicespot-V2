@@ -2,6 +2,7 @@ package Team.C.Service.Spot.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import Team.C.Service.Spot.dto.CustomerDTO;
 import Team.C.Service.Spot.dto.NotificationRequest;
@@ -25,6 +26,7 @@ public class CustomerController {
 
     private final CustomerService customerService;
     private final NotificationService notificationService;
+    private final PasswordEncoder passwordEncoder;
 
     private static final String ADMIN_EMAIL = "admin@servicespot.com";
 
@@ -102,6 +104,8 @@ public class CustomerController {
     public ResponseEntity<?> signup(@RequestBody CustomerDTO dto) {
         try {
             Customer customer = mapToEntity(dto);
+            // Hash password with BCrypt before saving
+            customer.setPassword(passwordEncoder.encode(dto.getPassword()));
             Customer saved = customerService.signup(customer);
 
             // Notify admin about new customer registration
@@ -134,7 +138,8 @@ public class CustomerController {
     @PostMapping(value = "/login", consumes = { "application/json" }, produces = { "application/json" })
     public ResponseEntity<?> login(@RequestBody CustomerDTO dto) {
         var customer = customerService.getCustomerByEmail(dto.getEmail());
-        if (customer.isPresent() && customer.get().getPassword().equals(dto.getPassword())) {
+        // Use BCrypt to verify password
+        if (customer.isPresent() && passwordEncoder.matches(dto.getPassword(), customer.get().getPassword())) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Login successful");
