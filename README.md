@@ -198,6 +198,9 @@ Real-time notifications via WebSocket (STOMP protocol):
 | Booking Cancelled | Both Parties | HIGH |
 | Review Received | Provider | NORMAL |
 | New Registration | Admin | NORMAL |
+| Contact Form Submission | Admin | NORMAL |
+
+
 
 ---
 
