@@ -58,7 +58,7 @@ export default function NearbyServices() {
   const showToast = (message, type = "error") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 4000);
-  }; 
+  };
 
 
 
@@ -129,24 +129,24 @@ export default function NearbyServices() {
   // Filter providers when activeService or activeDistance changes and sort by distance
   useEffect(() => {
     let filtered = nearbyProviders;
-    
+
     // Apply service filter
     if (activeService !== "All") {
       filtered = filtered.filter(p => p.serviceType === activeService);
     }
-    
+
     // Apply distance filter if activeDistance is set
     if (activeDistance) {
       filtered = filtered.filter(p => p.distance && p.distance <= activeDistance);
     }
-    
+
     // Sort by distance (closest first)
     filtered = filtered.sort((a, b) => {
       const distA = a.distance || Infinity;
       const distB = b.distance || Infinity;
       return distA - distB;
     });
-    
+
     setFilteredProviders(filtered);
   }, [activeService, activeDistance, nearbyProviders]);
 
@@ -156,11 +156,11 @@ export default function NearbyServices() {
       const response = await fetch(
         `http://localhost:8080/api/provider/nearby?lat=${position[0]}&lon=${position[1]}&radius=50000`
       );
-      
+
       if (response.ok) {
         const data = await response.json();
         console.log("Fetched providers count:", data.length);
-        
+
         setNearbyProviders(data);
 
         // Extract unique service types from data
@@ -181,7 +181,7 @@ export default function NearbyServices() {
   const handleBookNow = (providerId) => {
     const loggedIn = localStorage.getItem("loggedIn") === "true";
     const role = localStorage.getItem("role");
-    
+
     if (!loggedIn) {
       showToast("Please log in as a customer to book a service.", "warning");
       setTimeout(() => navigate("/login"), 1500);
@@ -221,7 +221,7 @@ export default function NearbyServices() {
           <p>{toast.message}</p>
         </div>
       )}
-      
+
       {error && (
         <div className="error-message">
           <p>{error}</p>
@@ -236,7 +236,7 @@ export default function NearbyServices() {
         <div className="map-container">
           <MapContainer center={position} zoom={13} scrollWheelZoom={true}>
             <ChangeView center={position} zoom={13} />
-            
+
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -249,40 +249,43 @@ export default function NearbyServices() {
               </Popup>
             </Marker>
 
-            {/* Provider Markers - BLUE for Active, GRAY for Inactive */}
+            {/* Provider Markers - BLUE for Verified with Services, GRAY for Unverified or No Services */}
             {filteredProviders
               .filter(p => p.latitude && p.longitude)
               .map((provider) => {
-                const isInactive = !provider.activeServiceCount || provider.activeServiceCount === 0;
+                const isUnverified = provider.verified === false;
+                const hasNoServices = !provider.activeServiceCount || provider.activeServiceCount === 0;
+                const isInactive = isUnverified || hasNoServices;
                 return (
-                <Marker
-                  key={provider.id}
-                  position={[provider.latitude, provider.longitude]}
-                  icon={isInactive ? grayIcon : blueIcon}
-                >
-                  <Popup>
-                    <div className={`provider-popup ${isInactive ? 'inactive' : ''}`}>
-                      <h3>{provider.name}</h3>
-                      {isInactive && <p className="inactive-status">⚠️ No Active Services</p>}
-                      <p className="service-type">{provider.serviceType}</p>
-                      <p>{provider.city}, {provider.state}</p>
-                      <p>Price: ₹{provider.price}</p>
-                      {provider.distance && <p>Distance: {provider.distance.toFixed(2)} km</p>}
-                      {!isInactive && (
-                        <button onClick={() => handleBookNow(provider.id)}>
-                          Book Now
-                        </button>
-                      )}
-                      {isInactive && (
-                        <div className="contact-info-popup">
-                          <p><FaPhone /> {provider.phone}</p>
-                          <p><FaEnvelope /> {provider.email}</p>
-                        </div>
-                      )}
-                    </div>
-                  </Popup>
-                </Marker>
-              );
+                  <Marker
+                    key={provider.id}
+                    position={[provider.latitude, provider.longitude]}
+                    icon={isInactive ? grayIcon : blueIcon}
+                  >
+                    <Popup>
+                      <div className={`provider-popup ${isInactive ? 'inactive' : ''}`}>
+                        <h3>{provider.name}</h3>
+                        {isUnverified && <p className="inactive-status">⚠️ Unverified Provider</p>}
+                        {!isUnverified && hasNoServices && <p className="inactive-status">⚠️ No Active Services</p>}
+                        <p className="service-type">{provider.serviceType}</p>
+                        <p>{provider.city}, {provider.state}</p>
+                        <p>Price: ₹{provider.price}</p>
+                        {provider.distance && <p>Distance: {provider.distance.toFixed(2)} km</p>}
+                        {!isInactive && (
+                          <button onClick={() => handleBookNow(provider.id)}>
+                            Book Now
+                          </button>
+                        )}
+                        {isInactive && (
+                          <div className="contact-info-popup">
+                            <p><FaPhone /> {provider.phone}</p>
+                            <p><FaEnvelope /> {provider.email}</p>
+                          </div>
+                        )}
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
               })}
           </MapContainer>
         </div>
@@ -290,9 +293,9 @@ export default function NearbyServices() {
         <div className="filters-sidebar">
           <div className="service-filter">
             <label htmlFor="service-select">Filter by Service: </label>
-            <select 
-              id="service-select" 
-              value={selectedService} 
+            <select
+              id="service-select"
+              value={selectedService}
               onChange={(e) => setSelectedService(e.target.value)}
               className="service-dropdown"
             >
@@ -305,11 +308,11 @@ export default function NearbyServices() {
           <div className="distance-filter">
             <label htmlFor="distance-input">Show nearby providers within (km): </label>
             <div className="distance-input-wrapper">
-              <input 
-                id="distance-input" 
-                type="number" 
-                min="1" 
-                max="50000" 
+              <input
+                id="distance-input"
+                type="number"
+                min="1"
+                max="50000"
                 placeholder="Enter distance"
                 value={nearbyDistance}
                 onChange={(e) => {
@@ -336,72 +339,72 @@ export default function NearbyServices() {
       <div className="nearby-list">
         <h2>{activeService === "All" ? "All Providers" : `${activeService} Providers`}</h2>
         {filteredProviders.length === 0 ? (
-            <p>No providers found for the selected service.</p>
+          <p>No providers found for the selected service.</p>
         ) : (
-            <div className="providers-grid">
-                {filteredProviders.map(provider => {
-                  const nearby = isProviderNearby(provider);
-                  const isInactive = !provider.activeServiceCount || provider.activeServiceCount === 0;
-                  return (
-                    <div 
-                      key={provider.id} 
-                      className={`provider-card ${nearby ? "nearby-highlight" : ""} ${provider.verified ? "verified-provider" : "unverified-provider"} ${isInactive ? "inactive-provider" : ""}`}
-                    >
-                      <div className="card-header">
-                        <h3>{provider.name}</h3>
-                        <div className="verification-badge">
-                          {provider.verified ? (
-                            <span className="verified-badge" title="Verified Provider">
-                              <FaCheckCircle /> Verified
-                            </span>
-                          ) : (
-                            <span className="unverified-badge" title="Not Yet Verified">
-                              <FaTimesCircle /> Unverified
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {nearby && <div className="nearby-tag">Nearby</div>}
-                      {isInactive && <div className="inactive-tag">No Services</div>}
-                      
-                      {isInactive && (
-                        <div className="inactive-message">
-                          <p className="inactive-status">⚠️ Currently Inactive</p>
-                          <p className="status-text">This provider does not have any active services at the moment.</p>
-                        </div>
-                      )}
-                      
-                      <p className="service-type">{provider.serviceType}</p>
-                      <p>{provider.city}, {provider.state}</p>
-                      <p>Price: ₹{provider.price}</p>
-                      {provider.distance ? (
-                          <p className={`distance ${nearby ? "nearby-distance" : ""}`}>
-                            Distance: {provider.distance.toFixed(2)} km
-                          </p>
+          <div className="providers-grid">
+            {filteredProviders.map(provider => {
+              const nearby = isProviderNearby(provider);
+              const isInactive = !provider.activeServiceCount || provider.activeServiceCount === 0;
+              return (
+                <div
+                  key={provider.id}
+                  className={`provider-card ${nearby ? "nearby-highlight" : ""} ${provider.verified ? "verified-provider" : "unverified-provider"} ${isInactive ? "inactive-provider" : ""}`}
+                >
+                  <div className="card-header">
+                    <h3>{provider.name}</h3>
+                    <div className="verification-badge">
+                      {provider.verified ? (
+                        <span className="verified-badge" title="Verified Provider">
+                          <FaCheckCircle /> Verified
+                        </span>
                       ) : (
-                          <p className="distance-missing">Location not available</p>
-                      )}
-                      
-                      {!isInactive && (
-                        <button onClick={() => handleBookNow(provider.id)} className="book-btn">
-                          Book Now
-                        </button>
-                      )}
-                      
-                      {isInactive && (
-                        <div className="contact-details">
-                          <p className="contact-label">Contact Provider to Inquire</p>
-                          <div className="contact-info">
-                            <p><FaPhone /> <a href={`tel:${provider.phone}`}>{provider.phone}</a></p>
-                            <p><FaEnvelope /> <a href={`mailto:${provider.email}`}>{provider.email}</a></p>
-                          </div>
-                        </div>
+                        <span className="unverified-badge" title="Not Yet Verified">
+                          <FaTimesCircle /> Unverified
+                        </span>
                       )}
                     </div>
-                  );
-                })}
-            </div>
+                  </div>
+
+                  {nearby && <div className="nearby-tag">Nearby</div>}
+                  {isInactive && <div className="inactive-tag">No Services</div>}
+
+                  {isInactive && (
+                    <div className="inactive-message">
+                      <p className="inactive-status">⚠️ Currently Inactive</p>
+                      <p className="status-text">This provider does not have any active services at the moment.</p>
+                    </div>
+                  )}
+
+                  <p className="service-type">{provider.serviceType}</p>
+                  <p>{provider.city}, {provider.state}</p>
+                  <p>Price: ₹{provider.price}</p>
+                  {provider.distance ? (
+                    <p className={`distance ${nearby ? "nearby-distance" : ""}`}>
+                      Distance: {provider.distance.toFixed(2)} km
+                    </p>
+                  ) : (
+                    <p className="distance-missing">Location not available</p>
+                  )}
+
+                  {!isInactive && (
+                    <button onClick={() => handleBookNow(provider.id)} className="book-btn">
+                      Book Now
+                    </button>
+                  )}
+
+                  {isInactive && (
+                    <div className="contact-details">
+                      <p className="contact-label">Contact Provider to Inquire</p>
+                      <div className="contact-info">
+                        <p><FaPhone /> <a href={`tel:${provider.phone}`}>{provider.phone}</a></p>
+                        <p><FaEnvelope /> <a href={`mailto:${provider.email}`}>{provider.email}</a></p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>

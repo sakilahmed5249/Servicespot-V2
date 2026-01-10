@@ -63,10 +63,9 @@ public class NotificationService {
 
             // Send to user-specific channel
             messagingTemplate.convertAndSendToUser(
-                recipientEmail,
-                "/queue/notifications",
-                notification
-            );
+                    recipientEmail,
+                    "/queue/notifications",
+                    notification);
 
             log.info("✅ Real-time notification sent successfully to user: {}", recipientEmail);
         } catch (Exception e) {
@@ -88,7 +87,8 @@ public class NotificationService {
      * Get unread notifications for a user
      */
     public List<NotificationDTO> getUnreadNotifications(String email) {
-        List<Notification> notifications = notificationRepo.findByRecipientEmailAndIsReadFalseOrderByCreatedAtDesc(email);
+        List<Notification> notifications = notificationRepo
+                .findByRecipientEmailAndIsReadFalseOrderByCreatedAtDesc(email);
         return notifications.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -122,6 +122,20 @@ public class NotificationService {
     @Transactional
     public int markAllAsRead(String email) {
         return notificationRepo.markAllAsRead(email, LocalDateTime.now());
+    }
+
+    /**
+     * Update recipient email for all notifications when user changes email
+     * This ensures notifications follow the user to their new email
+     */
+    @Transactional
+    public int updateRecipientEmail(String oldEmail, String newEmail) {
+        if (oldEmail == null || newEmail == null || oldEmail.equals(newEmail)) {
+            return 0;
+        }
+        int updated = notificationRepo.updateRecipientEmail(oldEmail, newEmail);
+        log.info("Updated {} notifications from {} to {}", updated, oldEmail, newEmail);
+        return updated;
     }
 
     /**
@@ -172,7 +186,8 @@ public class NotificationService {
                 .build();
     }
 
-    // ==================== Helper Methods for Common Notification Types ====================
+    // ==================== Helper Methods for Common Notification Types
+    // ====================
 
     /**
      * Create booking notification for provider
@@ -215,16 +230,17 @@ public class NotificationService {
     }
 
     /**
-     * Create booking confirmation notification for customer when they make a booking
+     * Create booking confirmation notification for customer when they make a
+     * booking
      */
-    public void notifyCustomerBookingConfirmed(String customerEmail, String providerName, Long bookingId, 
-                                               String serviceName, java.time.LocalDate date, java.time.LocalTime time) {
+    public void notifyCustomerBookingConfirmed(String customerEmail, String providerName, Long bookingId,
+            String serviceName, java.time.LocalDate date, java.time.LocalTime time) {
         NotificationRequest request = NotificationRequest.builder()
                 .recipientEmail(customerEmail)
                 .recipientRole("CUSTOMER")
                 .title("Booking Request Received")
-                .message("Your booking request for " + serviceName + " with " + providerName + " on " + 
-                         date + " at " + time + " has been submitted successfully")
+                .message("Your booking request for " + serviceName + " with " + providerName + " on " +
+                        date + " at " + time + " has been submitted successfully")
                 .type("BOOKING_CREATED")
                 .relatedEntityId(bookingId)
                 .relatedEntityType("BOOKING")
@@ -239,14 +255,14 @@ public class NotificationService {
     /**
      * Create booking accepted notification for customer when provider accepts
      */
-    public void notifyBookingAccepted(String customerEmail, String providerName, Long bookingId, 
-                                      String serviceName, java.time.LocalDate date, java.time.LocalTime time) {
+    public void notifyBookingAccepted(String customerEmail, String providerName, Long bookingId,
+            String serviceName, java.time.LocalDate date, java.time.LocalTime time) {
         NotificationRequest request = NotificationRequest.builder()
                 .recipientEmail(customerEmail)
                 .recipientRole("CUSTOMER")
                 .title("Booking Accepted! 🎉")
-                .message(providerName + " has accepted your booking for " + serviceName + " on " + 
-                         date + " at " + time)
+                .message(providerName + " has accepted your booking for " + serviceName + " on " +
+                        date + " at " + time)
                 .type("BOOKING_ACCEPTED")
                 .relatedEntityId(bookingId)
                 .relatedEntityType("BOOKING")
@@ -261,7 +277,8 @@ public class NotificationService {
     /**
      * Create booking cancellation notification
      */
-    public void notifyBookingCancelled(String recipientEmail, String recipientRole, String senderName, Long bookingId, String serviceName) {
+    public void notifyBookingCancelled(String recipientEmail, String recipientRole, String senderName, Long bookingId,
+            String serviceName) {
         NotificationRequest request = NotificationRequest.builder()
                 .recipientEmail(recipientEmail)
                 .recipientRole(recipientRole)
@@ -286,7 +303,8 @@ public class NotificationService {
                 .recipientEmail(customerEmail)
                 .recipientRole("CUSTOMER")
                 .title("Service Completed")
-                .message("Your service " + serviceName + " with " + providerName + " has been completed. Please leave a review!")
+                .message("Your service " + serviceName + " with " + providerName
+                        + " has been completed. Please leave a review!")
                 .type("BOOKING_COMPLETED")
                 .relatedEntityId(bookingId)
                 .relatedEntityType("BOOKING")
@@ -301,7 +319,8 @@ public class NotificationService {
     /**
      * Create review received notification for provider
      */
-    public void notifyReviewReceived(String providerEmail, String customerName, Long reviewId, int rating, String serviceName) {
+    public void notifyReviewReceived(String providerEmail, String customerName, Long reviewId, int rating,
+            String serviceName) {
         String stars = "⭐".repeat(Math.min(rating, 5)); // Generate star emoji based on rating
         NotificationRequest request = NotificationRequest.builder()
                 .recipientEmail(providerEmail)
@@ -319,4 +338,3 @@ public class NotificationService {
         createNotification(request);
     }
 }
-

@@ -11,6 +11,7 @@ import Team.C.Service.Spot.repositery.CustomerRepo;
 import Team.C.Service.Spot.repositery.ProviderRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ public class AuthService {
     private final ProviderRepo providerRepo;
     private final OTPService otpService;
     private final NotificationService notificationService;
+    private final PasswordEncoder passwordEncoder;
 
     // Admin email for notifications
     private static final String ADMIN_EMAIL = "admin@servicespot.com";
@@ -342,7 +344,7 @@ public class AuthService {
         Optional<Customer> customer = customerRepo.findByEmail(email);
         if (customer.isPresent()) {
             Customer c = customer.get();
-            c.setPassword(newPassword); // In production, hash this!
+            c.setPassword(passwordEncoder.encode(newPassword)); // Hash password with BCrypt
             customerRepo.save(c);
 
             return AuthResponse.builder()
@@ -354,7 +356,7 @@ public class AuthService {
         Optional<Provider> provider = providerRepo.findByEmail(email);
         if (provider.isPresent()) {
             Provider p = provider.get();
-            p.setPassword(newPassword); // In production, hash this!
+            p.setPassword(passwordEncoder.encode(newPassword)); // Hash password with BCrypt
             providerRepo.save(p);
 
             return AuthResponse.builder()

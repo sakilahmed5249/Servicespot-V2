@@ -3,6 +3,7 @@ package Team.C.Service.Spot.controller;
 import Team.C.Service.Spot.model.Admin;
 import Team.C.Service.Spot.model.Customer;
 import Team.C.Service.Spot.model.Provider;
+import Team.C.Service.Spot.security.AESEncryptionService;
 import Team.C.Service.Spot.services.AdminService;
 import Team.C.Service.Spot.services.ServiceService;
 import lombok.RequiredArgsConstructor;
@@ -13,21 +14,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
 public class AdminController {
-    
+
     private final AdminService adminService;
     private final ServiceService serviceService;
-    
+    private final AESEncryptionService aesEncryptionService;
+
     @PostMapping("/login")
     public ResponseEntity<?> loginAdmin(@RequestBody Map<String, String> credentials) {
         String email = credentials.get("email");
         String password = credentials.get("password");
-        
+
         Admin admin = adminService.authenticateAdmin(email, password);
         if (admin != null) {
             Map<String, Object> response = new HashMap<>();
@@ -38,17 +41,17 @@ public class AdminController {
             response.put("role", admin.getRole());
             return ResponseEntity.ok(response);
         }
-        
+
         Map<String, String> error = new HashMap<>();
         error.put("error", "Invalid email or password");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
-    
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getAdminById(@PathVariable Long id) {
         return ResponseEntity.ok(new HashMap<>().put("message", "Admin details retrieved"));
     }
-    
+
     @PostMapping("/init")
     public ResponseEntity<?> initializeAdmin() {
         Admin admin = adminService.createDefaultAdmin();
@@ -59,24 +62,49 @@ public class AdminController {
         response.put("password", admin.getPassword());
         return ResponseEntity.ok(response);
     }
-    
+
     @GetMapping("/customers")
-    public ResponseEntity<List<Customer>> getAllCustomers() {
+    public ResponseEntity<List<Map<String, Object>>> getAllCustomers() {
         List<Customer> customers = adminService.getAllCustomers();
-        return ResponseEntity.ok(customers);
+        // Decrypt phone numbers before returning
+        List<Map<String, Object>> result = customers.stream().map(c -> {
+            Map<String, Object> customerMap = new HashMap<>();
+            customerMap.put("id", c.getId());
+            customerMap.put("name", c.getName());
+            customerMap.put("email", c.getEmail());
+            customerMap.put("phone", aesEncryptionService.decrypt(c.getPhone()));
+            customerMap.put("city", c.getCity());
+            customerMap.put("role", c.getRole());
+            customerMap.put("verified", c.getVerified());
+            return customerMap;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(result);
     }
-    
+
     @GetMapping("/providers")
-    public ResponseEntity<List<Provider>> getAllProviders() {
+    public ResponseEntity<List<Map<String, Object>>> getAllProviders() {
         List<Provider> providers = adminService.getAllProviders();
-        return ResponseEntity.ok(providers);
+        // Decrypt phone numbers before returning
+        List<Map<String, Object>> result = providers.stream().map(p -> {
+            Map<String, Object> providerMap = new HashMap<>();
+            providerMap.put("id", p.getId());
+            providerMap.put("name", p.getName());
+            providerMap.put("email", p.getEmail());
+            providerMap.put("phone", aesEncryptionService.decrypt(p.getPhone()));
+            providerMap.put("city", p.getCity());
+            providerMap.put("serviceType", p.getServiceType());
+            providerMap.put("role", p.getRole());
+            providerMap.put("verified", p.getVerified());
+            return providerMap;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(result);
     }
-    
+
     @GetMapping("/services")
     public ResponseEntity<List<?>> getAllServices() {
         return ResponseEntity.ok(serviceService.getAllServices());
     }
-    
+
     @PostMapping("/customer/{customerId}/promote-admin")
     public ResponseEntity<?> promoteCustomerToAdmin(@PathVariable Long customerId) {
         Customer customer = adminService.promoteCustomerToAdmin(customerId);
@@ -89,7 +117,7 @@ public class AdminController {
         }
         return ResponseEntity.notFound().build();
     }
-    
+
     @PostMapping("/provider/{providerId}/promote-admin")
     public ResponseEntity<?> promoteProviderToAdmin(@PathVariable Long providerId) {
         Provider provider = adminService.promoteProviderToAdmin(providerId);
@@ -102,7 +130,7 @@ public class AdminController {
         }
         return ResponseEntity.notFound().build();
     }
-    
+
     @PostMapping("/customer/{customerId}/demote-admin")
     public ResponseEntity<?> demoteAdminToCustomer(@PathVariable Long customerId) {
         Customer customer = adminService.demoteAdminToCustomer(customerId);
@@ -115,7 +143,7 @@ public class AdminController {
         }
         return ResponseEntity.notFound().build();
     }
-    
+
     @PostMapping("/provider/{providerId}/demote-admin")
     public ResponseEntity<?> demoteAdminToProvider(@PathVariable Long providerId) {
         Provider provider = adminService.demoteAdminToProvider(providerId);
@@ -128,7 +156,7 @@ public class AdminController {
         }
         return ResponseEntity.notFound().build();
     }
-    
+
     @PostMapping("/customer/{customerId}/verify")
     public ResponseEntity<?> verifyCustomer(@PathVariable Long customerId) {
         Customer customer = adminService.verifyCustomer(customerId);
@@ -141,7 +169,7 @@ public class AdminController {
         }
         return ResponseEntity.notFound().build();
     }
-    
+
     @PostMapping("/customer/{customerId}/unverify")
     public ResponseEntity<?> unverifyCustomer(@PathVariable Long customerId) {
         Customer customer = adminService.unverifyCustomer(customerId);
@@ -154,7 +182,7 @@ public class AdminController {
         }
         return ResponseEntity.notFound().build();
     }
-    
+
     @PostMapping("/provider/{providerId}/verify")
     public ResponseEntity<?> verifyProvider(@PathVariable Long providerId) {
         Provider provider = adminService.verifyProvider(providerId);
@@ -167,7 +195,7 @@ public class AdminController {
         }
         return ResponseEntity.notFound().build();
     }
-    
+
     @PostMapping("/provider/{providerId}/unverify")
     public ResponseEntity<?> unverifyProvider(@PathVariable Long providerId) {
         Provider provider = adminService.unverifyProvider(providerId);
@@ -180,7 +208,7 @@ public class AdminController {
         }
         return ResponseEntity.notFound().build();
     }
-    
+
     @GetMapping("/statistics")
     public ResponseEntity<?> getStatistics() {
         try {
@@ -188,10 +216,10 @@ public class AdminController {
             long verifiedProviders = allProviders.stream()
                     .filter(p -> p.getVerified())
                     .count();
-            
+
             List<Customer> allCustomers = adminService.getAllCustomers();
             long totalCustomers = allCustomers.size();
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("tasksCompleted", 6450L);
@@ -199,7 +227,7 @@ public class AdminController {
             response.put("customerSatisfaction", 4.9);
             response.put("totalCustomers", totalCustomers);
             response.put("totalProviders", allProviders.size());
-            
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();

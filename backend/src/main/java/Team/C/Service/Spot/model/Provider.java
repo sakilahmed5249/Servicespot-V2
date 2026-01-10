@@ -17,7 +17,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="provider")
+@Table(name = "provider")
 @Data
 @Builder
 @NoArgsConstructor
@@ -25,62 +25,61 @@ import lombok.NoArgsConstructor;
 
 public class Provider {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
 
-    @Column(name = "name", nullable=false)
+    @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "email", unique=true, nullable=false)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
-    @Column(name = "password", nullable=false)
+    @Column(name = "password", nullable = false)
     private String password;
-    @Column(name = "phone", unique=true,nullable=false)
+    @Column(name = "phone", unique = true, nullable = false)
     private String phone;
-    @Column(name = "doorNo", nullable=false)
+    @Column(name = "doorNo", nullable = false)
     private String doorNo;
-    @Column(name = "addressLine", nullable=false)
+    @Column(name = "addressLine", nullable = false)
     private String addressLine;
-    @Column(name = "city", nullable=false)
+    @Column(name = "city", nullable = false)
     private String city;
-    @Column(name = "state", nullable=false)
-    private String state; 
-    @Column(name = "pincode", nullable=false)
+    @Column(name = "state", nullable = false)
+    private String state;
+    @Column(name = "pincode", nullable = false)
     private Integer pincode;
 
-    @Column(name = "country", nullable=true)
+    @Column(name = "country", nullable = true)
     private String country;
 
-    @Column(name = "serviceType", nullable=false)
+    @Column(name = "serviceType", nullable = false)
     private String serviceType;
 
-    @Column(name = "approxprice", nullable=true, columnDefinition = "FLOAT DEFAULT 0.0")
+    @Column(name = "approxprice", nullable = true, columnDefinition = "FLOAT DEFAULT 0.0")
     private Float price = 0.0f;
 
-    @Column(nullable=true)
+    @Column(nullable = true)
     private Double latitude;
 
-    @Column(nullable=true)
+    @Column(nullable = true)
     private Double longitude;
 
-    @Column(nullable=true)
+    @Column(nullable = true)
     private Boolean verified = false;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String role = "PROVIDER";
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable=true, updatable=false)
+    @Column(name = "created_at", nullable = true, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable=true)
+    @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
 
     @Lob
-    @Column(nullable=true)
+    @Column(nullable = true, columnDefinition = "LONGBLOB")
     private byte[] profileImage;
-    
+
     @Column(nullable = false)
     @Builder.Default
     private Boolean emailVerified = false;

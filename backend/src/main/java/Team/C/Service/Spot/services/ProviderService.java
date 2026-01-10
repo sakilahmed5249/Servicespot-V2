@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import Team.C.Service.Spot.model.Provider;
 import Team.C.Service.Spot.repositery.ProviderRepo;
@@ -13,10 +14,12 @@ import Team.C.Service.Spot.repositery.ServiceRepo;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProviderService {
 
     private final ProviderRepo providerRepo;
     private final ServiceRepo serviceRepo;
+    private final NotificationService notificationService;
 
     public Provider signup(Provider provider) {
         return providerRepo.save(provider);
@@ -50,6 +53,11 @@ public class ProviderService {
     public Provider updateProvider(Long id, Provider updatedProvider) {
         return providerRepo.findById(id)
                 .map(provider -> {
+                    // Track email change for notification migration
+                    String oldEmail = provider.getEmail();
+                    String newEmail = updatedProvider.getEmail();
+                    boolean emailChanged = newEmail != null && !newEmail.equals(oldEmail);
+
                     if (updatedProvider.getName() != null) {
                         provider.setName(updatedProvider.getName());
                     }
@@ -95,7 +103,16 @@ public class ProviderService {
                     if (updatedProvider.getProfileImage() != null) {
                         provider.setProfileImage(updatedProvider.getProfileImage());
                     }
-                    return providerRepo.save(provider);
+
+                    Provider saved = providerRepo.save(provider);
+
+                    // Migrate notifications if email changed
+                    if (emailChanged) {
+                        notificationService.updateRecipientEmail(oldEmail, newEmail);
+                        log.info("Migrated notifications for provider from {} to {}", oldEmail, newEmail);
+                    }
+
+                    return saved;
                 })
                 .orElse(null);
     }
@@ -172,7 +189,7 @@ public class ProviderService {
         double lonDistance = Math.toRadians(lon2 - lon1);
         double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
                 + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+                        * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
     }

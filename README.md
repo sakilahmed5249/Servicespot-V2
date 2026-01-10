@@ -28,7 +28,7 @@
 |---------|-------------|
 | 🗺️ **Location-Based Discovery** | Find nearby providers with interactive Leaflet maps |
 | 🔔 **Real-Time Notifications** | WebSocket-powered instant updates |
-| 🔐 **Enterprise Security** | BCrypt encryption, input validation, secure APIs |
+| 🔐 **Enterprise Security** | BCrypt password + AES phone encryption |
 | 📧 **OTP Verification** | Email-based account verification |
 | ⭐ **Reviews & Ratings** | Amazon-style customer feedback system |
 | 📱 **Responsive Design** | Seamless experience across all devices |
@@ -95,7 +95,7 @@ QuickServe/
 │   │   ├── model/                    # JPA entities
 │   │   ├── repositery/               # Data access layer
 │   │   ├── exception/                # Custom exceptions
-│   │   ├── security/                 # Security config
+│   │   ├── security/                 # Security config (BCrypt + AES)
 │   │   └── config/                   # App configuration
 │   └── pom.xml
 │
@@ -146,6 +146,11 @@ npm run dev
 - **Zero Exposure** — Passwords never returned in API responses
 - **Secure Change Flow** — Current password verification required
 
+### Phone Number Security
+- **AES-128 Encryption** — Two-way encryption for phone numbers
+- **Encrypted Storage** — Phone numbers stored as Base64 encoded strings
+- **Transparent Decryption** — Automatically decrypted for API responses
+
 ### Input Validation
 ```java
 @NotBlank(message = "Email is required")
@@ -155,6 +160,9 @@ private String email;
 @Size(min = 8, message = "Password must be 8+ characters")
 @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).*$")
 private String password;
+
+@Pattern(regexp = "^[0-9]{10}$", message = "Phone must be exactly 10 digits")
+private String phone;
 ```
 
 ### Exception Handling
@@ -200,8 +208,6 @@ Real-time notifications via WebSocket (STOMP protocol):
 | New Registration | Admin | NORMAL |
 | Contact Form Submission | Admin | NORMAL |
 
-
-
 ---
 
 ## 👥 User Roles
@@ -218,7 +224,7 @@ Real-time notifications via WebSocket (STOMP protocol):
 
 | Document | Description |
 |----------|-------------|
-| [Security Architecture](./Security.md) | BCrypt, DTOs, exceptions |
+| [Security Architecture](./Security.md) | BCrypt, AES, DTOs, exceptions |
 | [Notification System](./NOTIFICATION_SYSTEM_README.md) | WebSocket implementation |
 | [API Reference](./NOTIFICATION_SYSTEM_DOCUMENTATION.md) | Complete API docs |
 
@@ -253,5 +259,5 @@ This project is licensed under the MIT License.
 <p align="center">
   <strong>Built with ❤️ by Team C</strong>
   <br>
-  <sub>QuickServe v1.3.0 • December 2025</sub>
+  <sub>QuickServe v1.5.0 • January 2026</sub>
 </p>

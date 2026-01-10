@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./Login.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { FaUserCog } from "react-icons/fa";
 
@@ -76,10 +76,22 @@ export default function LoginProvider() {
             required
             onChange={handleChange}
           />
+
+          <div className="forgot-password-link-container">
+            <Link to="/forgot-password" state={{ userType: "provider" }} className="forgot-password-link">
+              Forgot Password?
+            </Link>
+          </div>
+
         </fieldset>
 
         <button className="login-btn">Login</button>
       </form>
+
+      <div className="register-link-container">
+        <p>Don't have an account? <Link to="/register-provider">Register here</Link></p>
+      </div>
     </div>
   );
 }
+

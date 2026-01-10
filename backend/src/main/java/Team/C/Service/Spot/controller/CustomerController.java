@@ -6,7 +6,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import Team.C.Service.Spot.dto.CustomerDTO;
 import Team.C.Service.Spot.dto.NotificationRequest;
+import Team.C.Service.Spot.exception.DuplicateEmailException;
+import Team.C.Service.Spot.exception.DuplicatePhoneException;
 import Team.C.Service.Spot.model.Customer;
+import Team.C.Service.Spot.repositery.CustomerRepo;
+import Team.C.Service.Spot.security.AESEncryptionService;
 import Team.C.Service.Spot.services.CustomerService;
 import Team.C.Service.Spot.services.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +31,8 @@ public class CustomerController {
     private final CustomerService customerService;
     private final NotificationService notificationService;
     private final PasswordEncoder passwordEncoder;
+    private final CustomerRepo customerRepo;
+    private final AESEncryptionService aesEncryptionService;
 
     private static final String ADMIN_EMAIL = "admin@servicespot.com";
 
@@ -45,7 +51,7 @@ public class CustomerController {
                 .id(customer.getId())
                 .name(customer.getName())
                 .email(customer.getEmail())
-                .phone(customer.getPhone())
+                .phone(aesEncryptionService.decrypt(customer.getPhone())) // Decrypt phone for display
                 .doorNo(customer.getDoorNo())
                 .addressLine(customer.getAddressLine())
                 .city(customer.getCity())
@@ -75,8 +81,15 @@ public class CustomerController {
         byte[] profileImageBytes = null;
         if (dto.getProfileImage() != null && !dto.getProfileImage().isEmpty()) {
             try {
-                profileImageBytes = java.util.Base64.getDecoder().decode(dto.getProfileImage());
+                String base64Data = dto.getProfileImage();
+                // Strip data:image/...;base64, prefix if present
+                if (base64Data.contains(",")) {
+                    base64Data = base64Data.substring(base64Data.indexOf(",") + 1);
+                }
+                profileImageBytes = java.util.Base64.getDecoder().decode(base64Data);
+                System.out.println("Decoded profile image: " + profileImageBytes.length + " bytes");
             } catch (IllegalArgumentException e) {
+                System.out.println("Failed to decode profile image: " + e.getMessage());
                 profileImageBytes = null;
             }
         }
@@ -84,7 +97,7 @@ public class CustomerController {
         return Customer.builder()
                 .name(dto.getName())
                 .email(dto.getEmail())
-                .phone(dto.getPhone())
+                .phone(aesEncryptionService.encrypt(dto.getPhone())) // Encrypt phone for storage
                 .doorNo(dto.getDoorNo())
                 .addressLine(dto.getAddressLine())
                 .city(dto.getCity())
@@ -103,6 +116,17 @@ public class CustomerController {
     @PostMapping(value = "/signup", consumes = { "application/json" }, produces = { "application/json" })
     public ResponseEntity<?> signup(@RequestBody CustomerDTO dto) {
         try {
+            // Check email uniqueness
+            if (customerRepo.findByEmail(dto.getEmail()).isPresent()) {
+                throw new DuplicateEmailException(dto.getEmail());
+            }
+
+            // Check phone uniqueness (encrypt to compare with DB)
+            String encryptedPhone = aesEncryptionService.encrypt(dto.getPhone());
+            if (customerRepo.findByPhone(encryptedPhone).isPresent()) {
+                throw new DuplicatePhoneException(dto.getPhone());
+            }
+
             Customer customer = mapToEntity(dto);
             // Hash password with BCrypt before saving
             customer.setPassword(passwordEncoder.encode(dto.getPassword()));

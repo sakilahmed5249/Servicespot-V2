@@ -4,14 +4,17 @@ import org.springframework.stereotype.Service;
 import Team.C.Service.Spot.model.Customer;
 import Team.C.Service.Spot.repositery.CustomerRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerService {
 
     private final CustomerRepo customerRepo;
+    private final NotificationService notificationService;
 
     public Customer signup(Customer customer) {
         return customerRepo.save(customer);
@@ -38,6 +41,11 @@ public class CustomerService {
     public Customer updateCustomer(Long id, Customer updatedCustomer) {
         return customerRepo.findById(id)
                 .map(existing -> {
+                    // Track email change for notification migration
+                    String oldEmail = existing.getEmail();
+                    String newEmail = updatedCustomer.getEmail();
+                    boolean emailChanged = newEmail != null && !newEmail.equals(oldEmail);
+
                     if (updatedCustomer.getName() != null) {
                         existing.setName(updatedCustomer.getName());
                     }
@@ -80,7 +88,16 @@ public class CustomerService {
                     if (updatedCustomer.getProfileImage() != null) {
                         existing.setProfileImage(updatedCustomer.getProfileImage());
                     }
-                    return customerRepo.save(existing);
+
+                    Customer saved = customerRepo.save(existing);
+
+                    // Migrate notifications if email changed
+                    if (emailChanged) {
+                        notificationService.updateRecipientEmail(oldEmail, newEmail);
+                        log.info("Migrated notifications for customer from {} to {}", oldEmail, newEmail);
+                    }
+
+                    return saved;
                 })
                 .orElse(null);
     }

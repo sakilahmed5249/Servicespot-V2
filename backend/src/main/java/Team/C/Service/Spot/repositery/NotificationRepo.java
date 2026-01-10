@@ -44,5 +44,9 @@ public interface NotificationRepo extends JpaRepository<Notification, Long> {
 
     // Find notifications related to a specific entity
     List<Notification> findByRelatedEntityIdAndRelatedEntityType(Long entityId, String entityType);
-}
 
+    // Update recipientEmail when user changes their email
+    @Modifying
+    @Query("UPDATE Notification n SET n.recipientEmail = :newEmail WHERE n.recipientEmail = :oldEmail")
+    int updateRecipientEmail(@Param("oldEmail") String oldEmail, @Param("newEmail") String newEmail);
+}

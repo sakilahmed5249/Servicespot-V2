@@ -2,6 +2,7 @@ package Team.C.Service.Spot.controller;
 
 import Team.C.Service.Spot.dto.ProviderDTO;
 import Team.C.Service.Spot.model.Provider;
+import Team.C.Service.Spot.security.AESEncryptionService;
 import Team.C.Service.Spot.services.ProviderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,17 +19,19 @@ import java.util.stream.Collectors;
 public class SearchController {
 
     private final ProviderService providerService;
+    private final AESEncryptionService aesEncryptionService;
 
     private ProviderDTO mapToDTO(Provider provider) {
         String profileImageBase64 = null;
         if (provider.getProfileImage() != null) {
-            profileImageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(provider.getProfileImage());
+            profileImageBase64 = "data:image/jpeg;base64,"
+                    + Base64.getEncoder().encodeToString(provider.getProfileImage());
         }
         return ProviderDTO.builder()
                 .id(provider.getId())
                 .name(provider.getName())
                 .email(provider.getEmail())
-                .phone(provider.getPhone())
+                .phone(aesEncryptionService.decrypt(provider.getPhone())) // Decrypt phone for display
                 .doorNo(provider.getDoorNo())
                 .addressLine(provider.getAddressLine())
                 .city(provider.getCity())
@@ -49,11 +52,11 @@ public class SearchController {
             @RequestParam(required = false) String service,
             @RequestParam(required = false) String area,
             @RequestParam(required = false) String city) {
-        
+
         service = (service != null && !service.trim().isEmpty()) ? service.trim() : null;
         area = (area != null && !area.trim().isEmpty()) ? area.trim() : null;
         city = (city != null && !city.trim().isEmpty()) ? city.trim() : null;
-        
+
         List<Provider> results = providerService.searchProviders(service, area, city);
         List<ProviderDTO> dtos = results.stream().map(this::mapToDTO).collect(Collectors.toList());
         return ResponseEntity.ok(dtos);

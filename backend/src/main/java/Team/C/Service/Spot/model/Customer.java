@@ -17,64 +17,64 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 @Data
 @Entity
-@Table(name="customer")
+@Table(name = "customer")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Customer {
-     
+
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String name;
 
-    @Column(unique=true, nullable=false)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(name = "password", nullable=false)
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(unique=true,nullable=false)
+    @Column(unique = true, nullable = false)
     private String phone;
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String doorNo;
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String addressLine;
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String city;
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String state;
-    @Column(nullable=false)
+    @Column(nullable = false)
     private Integer pincode;
 
-    @Column(nullable=true)
+    @Column(nullable = true)
     private String country;
 
-    @Column(nullable=true)
+    @Column(nullable = true)
     private Double latitude;
 
-    @Column(nullable=true)
+    @Column(nullable = true)
     private Double longitude;
 
-    @Column(nullable=true)
+    @Column(nullable = true)
     private Boolean verified;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String role = "CUSTOMER";
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable=false, updatable=false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable=false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     @Lob
-    @Column(nullable=true)
+    @Column(nullable = true, columnDefinition = "LONGBLOB")
     private byte[] profileImage;
-    
+
     @Column(nullable = false)
     @Builder.Default
     private Boolean emailVerified = false;
