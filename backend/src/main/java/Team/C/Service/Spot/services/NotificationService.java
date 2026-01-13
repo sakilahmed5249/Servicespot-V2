@@ -317,6 +317,46 @@ public class NotificationService {
     }
 
     /**
+     * Create notification for customer when provider is en route
+     */
+    public void notifyProviderEnRoute(String customerEmail, String providerName, Long bookingId, String serviceName) {
+        NotificationRequest request = NotificationRequest.builder()
+                .recipientEmail(customerEmail)
+                .recipientRole("CUSTOMER")
+                .title("Provider En Route 🚗")
+                .message(providerName + " is on the way to your location for " + serviceName)
+                .type("PROVIDER_EN_ROUTE")
+                .relatedEntityId(bookingId)
+                .relatedEntityType("BOOKING")
+                .actionUrl("/customer-bookings")
+                .senderName(providerName)
+                .priority("HIGH")
+                .build();
+
+        createNotification(request);
+    }
+
+    /**
+     * Create notification for customer when service starts
+     */
+    public void notifyServiceInProgress(String customerEmail, String providerName, Long bookingId, String serviceName) {
+        NotificationRequest request = NotificationRequest.builder()
+                .recipientEmail(customerEmail)
+                .recipientRole("CUSTOMER")
+                .title("Service Started 🛠️")
+                .message("The service '" + serviceName + "' has started")
+                .type("SERVICE_IN_PROGRESS")
+                .relatedEntityId(bookingId)
+                .relatedEntityType("BOOKING")
+                .actionUrl("/customer-bookings")
+                .senderName(providerName)
+                .priority("HIGH")
+                .build();
+
+        createNotification(request);
+    }
+
+    /**
      * Create review received notification for provider
      */
     public void notifyReviewReceived(String providerEmail, String customerName, Long reviewId, int rating,

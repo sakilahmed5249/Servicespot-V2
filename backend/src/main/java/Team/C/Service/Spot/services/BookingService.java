@@ -9,6 +9,7 @@ import Team.C.Service.Spot.repositery.ProviderRepo;
 import Team.C.Service.Spot.repositery.ServiceRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +23,7 @@ public class BookingService {
     private final CustomerRepo customerRepo;
     private final ProviderRepo providerRepo;
     private final ServiceRepo serviceRepo;
+    private final NotificationService notificationService;
     
     public Booking createBooking(Booking booking) {
         if (booking == null) {
@@ -86,6 +88,64 @@ public class BookingService {
 
     public Booking updateBookingDirect(Booking booking) {
         return bookingRepo.save(booking);
+    }
+
+    @Transactional
+    public Booking updateStatus(Long id, String newStatus) {
+        return bookingRepo.findById(id).map(booking -> {
+            String oldStatus = booking.getStatus();
+            booking.setStatus(newStatus);
+
+            if ("Accepted".equalsIgnoreCase(newStatus) && !newStatus.equalsIgnoreCase(oldStatus)) {
+                booking.setAcceptedAt(LocalDateTime.now());
+                String customerEmail = null;
+                if (booking.getCustomer() != null) {
+                    customerEmail = booking.getCustomer().getEmail();
+                } else if (booking.getProviderBooker() != null) {
+                    customerEmail = booking.getProviderBooker().getEmail();
+                }
+
+                if (customerEmail != null && booking.getProvider() != null) {
+                    notificationService.notifyBookingAccepted(
+                            customerEmail,
+                            booking.getProvider().getName(),
+                            booking.getId(),
+                            booking.getServiceName(),
+                            booking.getBookingDate(),
+                            booking.getBookingTime());
+                }
+            }
+
+            if ("Confirmed".equalsIgnoreCase(newStatus) && !newStatus.equalsIgnoreCase(oldStatus)) {
+                if (booking.getCustomer() != null && booking.getProvider() != null) {
+                    notificationService.notifyBookingConfirmed(
+                            booking.getCustomer().getEmail(),
+                            booking.getProvider().getName(),
+                            booking.getId(),
+                            booking.getServiceName());
+                }
+            }
+
+            if ("En Route".equalsIgnoreCase(newStatus) && !newStatus.equalsIgnoreCase(oldStatus)) {
+                booking.setEnRouteAt(LocalDateTime.now());
+                String customerEmail = booking.getCustomer() != null ? booking.getCustomer().getEmail() : 
+                                     (booking.getProviderBooker() != null ? booking.getProviderBooker().getEmail() : null);
+                if (customerEmail != null && booking.getProvider() != null) {
+                    notificationService.notifyProviderEnRoute(customerEmail, booking.getProvider().getName(), booking.getId(), booking.getServiceName());
+                }
+            }
+
+            if ("In Progress".equalsIgnoreCase(newStatus) && !newStatus.equalsIgnoreCase(oldStatus)) {
+                booking.setInProgressAt(LocalDateTime.now());
+                String customerEmail = booking.getCustomer() != null ? booking.getCustomer().getEmail() : 
+                                     (booking.getProviderBooker() != null ? booking.getProviderBooker().getEmail() : null);
+                if (customerEmail != null && booking.getProvider() != null) {
+                    notificationService.notifyServiceInProgress(customerEmail, booking.getProvider().getName(), booking.getId(), booking.getServiceName());
+                }
+            }
+
+            return bookingRepo.save(booking);
+        }).orElseThrow(() -> new RuntimeException("Booking not found with id: " + id));
     }
     
     public Booking cancelBooking(Long id) {

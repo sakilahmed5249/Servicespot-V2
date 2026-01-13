@@ -70,6 +70,15 @@ public class Booking {
     private LocalDateTime updatedAt;
     
     @Column(nullable = true)
+    private LocalDateTime acceptedAt;
+    
+    @Column(nullable = true)
+    private LocalDateTime enRouteAt;
+    
+    @Column(nullable = true)
+    private LocalDateTime inProgressAt;
+    
+    @Column(nullable = true)
     private LocalDateTime completedAt;
     
     @Column(nullable = true)

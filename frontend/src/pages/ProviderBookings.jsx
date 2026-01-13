@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./ProviderBookings.css";
-import { FaClock, FaCalendarAlt, FaUserTie, FaCheckCircle, FaTimesCircle, FaUserCircle } from "react-icons/fa";
+import { FaClock, FaCalendarAlt, FaUserTie, FaCheckCircle, FaTimesCircle, FaUserCircle, FaTruck, FaTools } from "react-icons/fa";
 
 export default function ProviderBookings() {
 
@@ -59,6 +59,19 @@ export default function ProviderBookings() {
     } catch (error) {
       console.error("Error rejecting booking:", error);
       alert("Failed to reject booking");
+    }
+  };
+
+  const updateBookingStatus = async (id, newStatus) => {
+    try {
+      await axios.put(`http://localhost:8080/booking/${id}`, {
+        status: newStatus
+      });
+      alert(`Status updated to ${newStatus}`);
+      fetchBookings();
+    } catch (error) {
+      console.error(`Error updating status to ${newStatus}:`, error);
+      alert(`Failed to update status to ${newStatus}`);
     }
   };
 
@@ -150,7 +163,25 @@ export default function ProviderBookings() {
                       </button>
                     </>
                   )}
-                  {booking.status === "Accepted" && (
+                  {(booking.status === "Accepted" || booking.status === "Confirmed") && (
+                    <>
+                      <button 
+                        className="enroute-btn" 
+                        onClick={() => updateBookingStatus(booking.id, "En Route")}
+                      >
+                        <FaTruck /> En Route
+                      </button>
+                    </>
+                  )}
+                  {booking.status === "En Route" && (
+                    <button 
+                      className="inprogress-btn" 
+                      onClick={() => updateBookingStatus(booking.id, "In Progress")}
+                    >
+                      <FaTools /> Start Service
+                    </button>
+                  )}
+                  {(booking.status === "Accepted" || booking.status === "Confirmed" || booking.status === "In Progress") && (
                     <button 
                       className="complete-btn" 
                       onClick={() => completeBooking(booking.id)}

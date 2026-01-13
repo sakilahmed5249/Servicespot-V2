@@ -46,6 +46,7 @@ import Contact from "./pages/Contact";
 import OTPVerification from "./pages/OTPVerification";
 import ForgotPassword from "./pages/ForgotPassword";
 import Notifications from "./pages/Notifications";
+import Location from "./pages/Location";
 
 export default function App() {
   return (
@@ -105,6 +106,7 @@ export default function App() {
 
           {/* ⭐ Notifications */}
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/location" element={<Location />} />
 
         </Routes>
 

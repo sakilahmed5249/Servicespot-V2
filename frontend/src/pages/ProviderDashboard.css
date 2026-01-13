@@ -309,7 +309,10 @@
 }
 
 .accept-mini-btn,
-.reject-mini-btn {
+.reject-mini-btn,
+.complete-mini-btn,
+.enroute-mini-btn,
+.inprogress-mini-btn {
   flex: 1;
   padding: 8px 12px;
   border: none;
@@ -318,6 +321,34 @@
   font-weight: 600;
   font-size: 12px;
   transition: 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.enroute-mini-btn {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+}
+
+.enroute-mini-btn:hover {
+  background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
+  transform: translateY(-1px);
+}
+
+.inprogress-mini-btn {
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(155, 89, 182, 0.3);
+}
+
+.inprogress-mini-btn:hover {
+  background: linear-gradient(135deg, #8e44ad 0%, #7d3c98 100%);
+  box-shadow: 0 4px 12px rgba(155, 89, 182, 0.4);
+  transform: translateY(-1px);
 }
 
 .accept-mini-btn {
@@ -341,6 +372,18 @@
 .reject-mini-btn:hover {
   background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
   box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+  transform: translateY(-1px);
+}
+
+.complete-mini-btn {
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+}
+
+.complete-mini-btn:hover {
+  background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%);
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
   transform: translateY(-1px);
 }
 

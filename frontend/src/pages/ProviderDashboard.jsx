@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./ProviderDashboard.css";
 import "./ProviderProfile.css";
 import { useNavigate } from "react-router-dom";
-import { FaPlus, FaEdit, FaTrash, FaStar, FaSignOutAlt, FaCalendarAlt, FaClock, FaUserTie, FaUserCircle } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaStar, FaSignOutAlt, FaCalendarAlt, FaClock, FaUserTie, FaUserCircle, FaTruck, FaTools, FaCheckCircle } from "react-icons/fa";
 import axios from "axios";
 
 export default function ProviderDashboard() {
@@ -260,6 +260,33 @@ export default function ProviderDashboard() {
     }
   };
 
+  const handleUpdateBookingStatus = async (bookingId, newStatus) => {
+    try {
+      await axios.put(`http://localhost:8080/booking/${bookingId}`, {
+        status: newStatus
+      });
+      alert(`Status updated to ${newStatus}`);
+      fetchProviderData();
+    } catch (error) {
+      console.error(`Error updating status to ${newStatus}:`, error);
+      alert(`Failed to update status to ${newStatus}`);
+    }
+  };
+
+  const handleCompleteBooking = async (bookingId) => {
+    const confirm = window.confirm("Mark this booking as completed?");
+    if (!confirm) return;
+
+    try {
+      await axios.put(`http://localhost:8080/booking/complete/${bookingId}`);
+      alert("Booking Completed!");
+      fetchProviderData();
+    } catch (error) {
+      console.error("Error completing booking:", error);
+      alert("Failed to complete booking");
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("loggedIn");
     localStorage.removeItem("role");
@@ -377,6 +404,36 @@ export default function ProviderDashboard() {
                       onClick={() => handleRejectBooking(booking.id)}
                     >
                       Reject
+                    </button>
+                  </div>
+                )}
+                {(booking.status === "Accepted" || booking.status === "Confirmed") && (
+                  <div className="booking-actions">
+                    <button 
+                      className="enroute-mini-btn"
+                      onClick={() => handleUpdateBookingStatus(booking.id, "En Route")}
+                    >
+                      <FaTruck /> En Route
+                    </button>
+                  </div>
+                )}
+                {booking.status === "En Route" && (
+                  <div className="booking-actions">
+                    <button 
+                      className="inprogress-mini-btn"
+                      onClick={() => handleUpdateBookingStatus(booking.id, "In Progress")}
+                    >
+                      <FaTools /> Start Service
+                    </button>
+                  </div>
+                )}
+                {(booking.status === "Accepted" || booking.status === "Confirmed" || booking.status === "In Progress") && (
+                  <div className="booking-actions">
+                    <button 
+                      className="complete-mini-btn"
+                      onClick={() => handleCompleteBooking(booking.id)}
+                    >
+                      Mark Complete
                     </button>
                   </div>
                 )}

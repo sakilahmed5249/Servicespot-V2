@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./CustomerBookings.css";
-import { FaClock, FaCalendarAlt, FaUserTie, FaTimesCircle, FaStar } from "react-icons/fa";
+import { FaClock, FaCalendarAlt, FaUserTie, FaTimesCircle, FaStar, FaMapMarkerAlt, FaCheckCircle, FaTools, FaTruck } from "react-icons/fa";
 
 export default function CustomerBookings() {
 
@@ -9,6 +9,7 @@ export default function CustomerBookings() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [ratingBookingId, setRatingBookingId] = useState(null);
+  const [trackingBooking, setTrackingBooking] = useState(null);
   const [ratingData, setRatingData] = useState({ stars: 5, review: "" });
   const [submittingRating, setSubmittingRating] = useState(false);
   const customerId = localStorage.getItem("customerId");
@@ -16,30 +17,36 @@ export default function CustomerBookings() {
   useEffect(() => {
     if (customerId) {
       fetchBookings();
+      // Auto refresh every 30 seconds if there's an active tracking
+      const interval = setInterval(() => {
+        fetchBookings(false);
+      }, 30000);
+      return () => clearInterval(interval);
     } else {
       setError("Customer ID not found. Please login again.");
       setLoading(false);
     }
   }, []);
 
-  const fetchBookings = async () => {
+  const fetchBookings = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       setError(null);
-      console.log("Fetching bookings for customer:", customerId);
       const res = await axios.get(
         `http://localhost:8080/booking/customer/${customerId}`
       );
-      console.log("Bookings received:", res.data);
-      res.data.forEach((b, idx) => {
-        console.log(`Booking ${idx} provider image present:`, b.providerProfileImage ? `Yes, length: ${b.providerProfileImage.length}` : "No");
-      });
       setBookings(Array.isArray(res.data) ? res.data : []);
+      
+      // Update tracking booking if it's open
+      if (trackingBooking) {
+        const updated = res.data.find(b => b.id === trackingBooking.id);
+        if (updated) setTrackingBooking(updated);
+      }
     } catch (error) {
       console.error("Error fetching bookings:", error);
-      setError("Failed to load bookings: " + (error.response?.data || error.message));
+      if (showLoading) setError("Failed to load bookings: " + (error.response?.data || error.message));
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -149,6 +156,15 @@ export default function CustomerBookings() {
                 </button>
               )}
 
+              {(b.status === "Accepted" || b.status === "Confirmed" || b.status === "En Route" || b.status === "In Progress") && (
+                <button 
+                  className="track-btn" 
+                  onClick={() => setTrackingBooking(b)}
+                >
+                  <FaMapMarkerAlt /> Track Service
+                </button>
+              )}
+
               {b.status === "Completed" && ratingBookingId !== b.id && (
                 <button 
                   className="rate-btn" 
@@ -208,6 +224,62 @@ export default function CustomerBookings() {
             </div>
           ))
         )}
+        </div>
+      )}
+
+      {trackingBooking && (
+        <div className="tracking-modal-overlay">
+          <div className="tracking-modal">
+            <div className="tracking-modal-header">
+              <h3>Track Service: {trackingBooking.serviceName}</h3>
+              <button className="close-modal" onClick={() => setTrackingBooking(null)}>✕</button>
+            </div>
+            
+            <div className="tracking-content">
+              <div className="tracking-status-flow">
+                <div className={`status-step ${['Accepted', 'Confirmed', 'En Route', 'In Progress', 'Completed'].includes(trackingBooking.status) ? 'completed' : ''}`}>
+                  <div className="step-icon"><FaCheckCircle /></div>
+                  <div className="step-label">Booking Confirmed</div>
+                  <div className="step-time">{trackingBooking.acceptedAt ? new Date(trackingBooking.acceptedAt).toLocaleTimeString() : ''}</div>
+                </div>
+                
+                <div className={`status-step ${['En Route', 'In Progress', 'Completed'].includes(trackingBooking.status) ? 'completed' : ''} ${trackingBooking.status === 'En Route' ? 'active' : ''}`}>
+                  <div className="step-icon"><FaTruck /></div>
+                  <div className="step-label">Provider En Route</div>
+                  <div className="step-time">{trackingBooking.enRouteAt ? new Date(trackingBooking.enRouteAt).toLocaleTimeString() : ''}</div>
+                </div>
+                
+                <div className={`status-step ${['In Progress', 'Completed'].includes(trackingBooking.status) ? 'completed' : ''} ${trackingBooking.status === 'In Progress' ? 'active' : ''}`}>
+                  <div className="step-icon"><FaTools /></div>
+                  <div className="step-label">Service In Progress</div>
+                  <div className="step-time">{trackingBooking.inProgressAt ? new Date(trackingBooking.inProgressAt).toLocaleTimeString() : ''}</div>
+                </div>
+                
+                <div className={`status-step ${trackingBooking.status === 'Completed' ? 'completed' : ''}`}>
+                  <div className="step-icon"><FaCheckCircle /></div>
+                  <div className="step-label">Completed</div>
+                  <div className="step-time">{trackingBooking.completedAt ? new Date(trackingBooking.completedAt).toLocaleTimeString() : ''}</div>
+                </div>
+              </div>
+
+              <div className="provider-tracking-info">
+                <h4>Service Provider</h4>
+                <div className="tracking-provider-card">
+                   {trackingBooking.providerProfileImage && (
+                    <img src={trackingBooking.providerProfileImage} alt="Provider" className="tracking-avatar" />
+                   )}
+                   <div className="tracking-provider-details">
+                      <p><strong>{trackingBooking.providerName}</strong></p>
+                      <p>📱 {trackingBooking.providerPhone}</p>
+                      <div className="status-live-indicator">
+                        <span className="pulse"></span>
+                        Status: {trackingBooking.status}
+                      </div>
+                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

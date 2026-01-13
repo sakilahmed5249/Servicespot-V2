@@ -76,47 +76,49 @@ public class BookingController {
             providerBookerProfileImage = null;
         }
 
-        return new HashMap<String, Object>() {
-            {
-                put("id", booking.getId());
-                put("serviceName", booking.getServiceName());
-                put("date", booking.getBookingDate());
-                put("time", booking.getBookingTime());
-                put("status", booking.getStatus());
-                put("notes", booking.getNotes());
-                put("totalAmount", booking.getTotalAmount());
-                put("createdAt", booking.getCreatedAt());
-                put("updatedAt", booking.getUpdatedAt());
-                put("completedAt", booking.getCompletedAt());
-                put("cancelledAt", booking.getCancelledAt());
-                put("customerId", booking.getCustomer() != null ? booking.getCustomer().getId() : null);
-                put("customerName", booking.getCustomer() != null ? booking.getCustomer().getName() : null);
-                put("customerPhone",
-                        booking.getCustomer() != null ? aesEncryptionService.decrypt(booking.getCustomer().getPhone())
-                                : null);
-                put("customerEmail", booking.getCustomer() != null ? booking.getCustomer().getEmail() : null);
-                put("customerProfileImage", customerProfileImage);
-                put("providerBookerId",
-                        booking.getProviderBooker() != null ? booking.getProviderBooker().getId() : null);
-                put("providerBookerName",
-                        booking.getProviderBooker() != null ? booking.getProviderBooker().getName() : null);
-                put("providerBookerPhone",
-                        booking.getProviderBooker() != null
-                                ? aesEncryptionService.decrypt(booking.getProviderBooker().getPhone())
-                                : null);
-                put("providerBookerEmail",
-                        booking.getProviderBooker() != null ? booking.getProviderBooker().getEmail() : null);
-                put("providerBookerProfileImage", providerBookerProfileImage);
-                put("providerId", booking.getProvider() != null ? booking.getProvider().getId() : null);
-                put("providerName", booking.getProvider() != null ? booking.getProvider().getName() : null);
-                put("providerPhone",
-                        booking.getProvider() != null ? aesEncryptionService.decrypt(booking.getProvider().getPhone())
-                                : null);
-                put("providerEmail", booking.getProvider() != null ? booking.getProvider().getEmail() : null);
-                put("providerProfileImage", providerProfileImage);
-                put("serviceId", booking.getService() != null ? booking.getService().getId() : null);
-            }
-        };
+        Map<String, Object> dto = new HashMap<>();
+        dto.put("id", booking.getId());
+        dto.put("serviceName", booking.getServiceName());
+        dto.put("date", booking.getBookingDate());
+        dto.put("time", booking.getBookingTime());
+        dto.put("status", booking.getStatus());
+        dto.put("notes", booking.getNotes());
+        dto.put("totalAmount", booking.getTotalAmount());
+        dto.put("createdAt", booking.getCreatedAt());
+        dto.put("updatedAt", booking.getUpdatedAt());
+        dto.put("acceptedAt", booking.getAcceptedAt());
+        dto.put("enRouteAt", booking.getEnRouteAt());
+        dto.put("inProgressAt", booking.getInProgressAt());
+        dto.put("completedAt", booking.getCompletedAt());
+        dto.put("cancelledAt", booking.getCancelledAt());
+        dto.put("customerId", booking.getCustomer() != null ? booking.getCustomer().getId() : null);
+        dto.put("customerName", booking.getCustomer() != null ? booking.getCustomer().getName() : null);
+        dto.put("customerPhone",
+                booking.getCustomer() != null ? aesEncryptionService.decrypt(booking.getCustomer().getPhone())
+                        : null);
+        dto.put("customerEmail", booking.getCustomer() != null ? booking.getCustomer().getEmail() : null);
+        dto.put("customerProfileImage", customerProfileImage);
+        dto.put("providerBookerId",
+                booking.getProviderBooker() != null ? booking.getProviderBooker().getId() : null);
+        dto.put("providerBookerName",
+                booking.getProviderBooker() != null ? booking.getProviderBooker().getName() : null);
+        dto.put("providerBookerPhone",
+                booking.getProviderBooker() != null
+                        ? aesEncryptionService.decrypt(booking.getProviderBooker().getPhone())
+                        : null);
+        dto.put("providerBookerEmail",
+                booking.getProviderBooker() != null ? booking.getProviderBooker().getEmail() : null);
+        dto.put("providerBookerProfileImage", providerBookerProfileImage);
+        dto.put("providerId", booking.getProvider() != null ? booking.getProvider().getId() : null);
+        dto.put("providerName", booking.getProvider() != null ? booking.getProvider().getName() : null);
+        dto.put("providerPhone",
+                booking.getProvider() != null ? aesEncryptionService.decrypt(booking.getProvider().getPhone())
+                        : null);
+        dto.put("providerEmail", booking.getProvider() != null ? booking.getProvider().getEmail() : null);
+        dto.put("providerProfileImage", providerProfileImage);
+        dto.put("serviceId", booking.getService() != null ? booking.getService().getId() : null);
+
+        return dto;
     }
 
     @PostMapping("/create")
@@ -297,48 +299,20 @@ public class BookingController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBooking(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         try {
+            if (updates.containsKey("status") && updates.size() == 1) {
+                Booking updated = bookingService.updateStatus(id, (String) updates.get("status"));
+                return ResponseEntity.ok(convertToDTO(updated));
+            }
+
             Optional<Booking> existingBooking = bookingService.getBookingById(id);
             if (!existingBooking.isPresent()) {
                 return ResponseEntity.notFound().build();
             }
 
             Booking booking = existingBooking.get();
-            String oldStatus = booking.getStatus();
 
             if (updates.containsKey("status")) {
-                String newStatus = (String) updates.get("status");
-                booking.setStatus(newStatus);
-
-                // Send notification when status changes to Accepted
-                if ("Accepted".equalsIgnoreCase(newStatus) && !newStatus.equals(oldStatus)) {
-                    String customerEmail = null;
-                    if (booking.getCustomer() != null) {
-                        customerEmail = booking.getCustomer().getEmail();
-                    } else if (booking.getProviderBooker() != null) {
-                        customerEmail = booking.getProviderBooker().getEmail();
-                    }
-
-                    if (customerEmail != null) {
-                        notificationService.notifyBookingAccepted(
-                                customerEmail,
-                                booking.getProvider().getName(),
-                                booking.getId(),
-                                booking.getServiceName(),
-                                booking.getBookingDate(),
-                                booking.getBookingTime());
-                    }
-                }
-
-                // Send notification when status changes to Confirmed (if using different flow)
-                if ("Confirmed".equalsIgnoreCase(newStatus) && !newStatus.equals(oldStatus)) {
-                    if (booking.getCustomer() != null) {
-                        notificationService.notifyBookingConfirmed(
-                                booking.getCustomer().getEmail(),
-                                booking.getProvider().getName(),
-                                booking.getId(),
-                                booking.getServiceName());
-                    }
-                }
+                booking.setStatus((String) updates.get("status"));
             }
             if (updates.containsKey("notes")) {
                 booking.setNotes((String) updates.get("notes"));
