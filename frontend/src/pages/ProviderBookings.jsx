@@ -53,7 +53,7 @@ export default function ProviderBookings() {
     if (!confirm) return;
 
     try {
-      await axios.put(`http://localhost:8080/booking/cancel/${id}`);
+      await axios.put(`http://localhost:8080/booking/cancel/${id}`, { cancelledBy: "PROVIDER" });
       alert("Booking Rejected!");
       fetchBookings();
     } catch (error) {
@@ -122,14 +122,14 @@ export default function ProviderBookings() {
                 <div className="customer-profile-section">
                   <div className="customer-avatar">
                     {booking.customerProfileImage ? (
-                      <img 
-                        src={booking.customerProfileImage} 
-                        alt="Customer" 
-                        className="customer-profile-img" 
+                      <img
+                        src={booking.customerProfileImage}
+                        alt="Customer"
+                        className="customer-profile-img"
                         onError={(e) => {
                           e.target.style.display = 'none';
                           e.target.onerror = null;
-                        }} 
+                        }}
                       />
                     ) : (
                       <FaUserCircle size={50} color="#0A4D68" />
@@ -149,14 +149,14 @@ export default function ProviderBookings() {
                 <div className="action-buttons">
                   {booking.status === "Pending" && (
                     <>
-                      <button 
-                        className="accept-btn" 
+                      <button
+                        className="accept-btn"
                         onClick={() => acceptBooking(booking.id)}
                       >
                         <FaCheckCircle /> Accept
                       </button>
-                      <button 
-                        className="reject-btn" 
+                      <button
+                        className="reject-btn"
                         onClick={() => rejectBooking(booking.id)}
                       >
                         <FaTimesCircle /> Reject
@@ -165,8 +165,8 @@ export default function ProviderBookings() {
                   )}
                   {(booking.status === "Accepted" || booking.status === "Confirmed") && (
                     <>
-                      <button 
-                        className="enroute-btn" 
+                      <button
+                        className="enroute-btn"
                         onClick={() => updateBookingStatus(booking.id, "En Route")}
                       >
                         <FaTruck /> En Route
@@ -174,16 +174,16 @@ export default function ProviderBookings() {
                     </>
                   )}
                   {booking.status === "En Route" && (
-                    <button 
-                      className="inprogress-btn" 
+                    <button
+                      className="inprogress-btn"
                       onClick={() => updateBookingStatus(booking.id, "In Progress")}
                     >
                       <FaTools /> Start Service
                     </button>
                   )}
                   {(booking.status === "Accepted" || booking.status === "Confirmed" || booking.status === "In Progress") && (
-                    <button 
-                      className="complete-btn" 
+                    <button
+                      className="complete-btn"
                       onClick={() => completeBooking(booking.id)}
                     >
                       <FaCheckCircle /> Mark Complete

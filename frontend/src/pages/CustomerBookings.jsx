@@ -36,7 +36,7 @@ export default function CustomerBookings() {
         `http://localhost:8080/booking/customer/${customerId}`
       );
       setBookings(Array.isArray(res.data) ? res.data : []);
-      
+
       // Update tracking booking if it's open
       if (trackingBooking) {
         const updated = res.data.find(b => b.id === trackingBooking.id);
@@ -55,7 +55,7 @@ export default function CustomerBookings() {
     if (!confirm) return;
 
     try {
-      await axios.put(`http://localhost:8080/booking/cancel/${id}`);
+      await axios.put(`http://localhost:8080/booking/cancel/${id}`, { cancelledBy: "CUSTOMER" });
       alert("Booking Cancelled!");
       fetchBookings();
     } catch (error) {
@@ -115,115 +115,115 @@ export default function CustomerBookings() {
           {bookings.length === 0 ? (
             <p className="no-bookings">No bookings found.</p>
           ) : (
-          bookings.map((b) => (
-            <div className="booking-card" key={b.id}>
-              
-              <div className="booking-header">
-                <h3>{b.serviceName}</h3>
-                <span className={`status ${b.status.toLowerCase()}`}>
-                  {b.status}
-                </span>
-              </div>
+            bookings.map((b) => (
+              <div className="booking-card" key={b.id}>
 
-              <div className="provider-info">
-                {b.providerProfileImage && (
-                  <img 
-                    src={b.providerProfileImage} 
-                    alt="Provider" 
-                    className="provider-avatar" 
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.onerror = null;
-                    }} 
-                  />
-                )}
-                <div>
-                  <p><FaUserTie /> Provider: {b.providerName || `ID: ${b.providerId}`}</p>
+                <div className="booking-header">
+                  <h3>{b.serviceName}</h3>
+                  <span className={`status ${b.status.toLowerCase()}`}>
+                    {b.status}
+                  </span>
                 </div>
-              </div>
-              {b.providerPhone && <p>📱 Phone: {b.providerPhone}</p>}
-              {b.providerEmail && <p>✉️ Email: {b.providerEmail}</p>}
-              <p><FaCalendarAlt /> Date: {b.date}</p>
-              <p><FaClock /> Time: {b.time}</p>
-              {b.totalAmount && <p>💰 Amount: ₹{b.totalAmount}</p>}
 
-              {b.status === "Pending" && (
-                <button 
-                  className="cancel-btn" 
-                  onClick={() => cancelBooking(b.id)}
-                >
-                  <FaTimesCircle /> Cancel Booking
-                </button>
-              )}
-
-              {(b.status === "Accepted" || b.status === "Confirmed" || b.status === "En Route" || b.status === "In Progress") && (
-                <button 
-                  className="track-btn" 
-                  onClick={() => setTrackingBooking(b)}
-                >
-                  <FaMapMarkerAlt /> Track Service
-                </button>
-              )}
-
-              {b.status === "Completed" && ratingBookingId !== b.id && (
-                <button 
-                  className="rate-btn" 
-                  onClick={() => setRatingBookingId(b.id)}
-                >
-                  <FaStar /> Rate Service
-                </button>
-              )}
-
-              {b.status === "Completed" && ratingBookingId === b.id && (
-                <div className="rating-form">
-                  <div className="rating-section">
-                    <label>Rating:</label>
-                    <div className="star-rating">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          className={`star ${star <= ratingData.stars ? 'active' : ''}`}
-                          onClick={() => setRatingData({ ...ratingData, stars: star })}
-                        >
-                          ★
-                        </button>
-                      ))}
-                    </div>
-                    <span className="rating-text">{ratingData.stars}/5</span>
-                  </div>
-
-                  <textarea
-                    className="review-textarea"
-                    placeholder="Share your experience with this service..."
-                    value={ratingData.review}
-                    onChange={(e) => setRatingData({ ...ratingData, review: e.target.value })}
-                    rows="3"
-                  />
-
-                  <div className="rating-actions">
-                    <button
-                      className="submit-rating-btn"
-                      onClick={() => submitRating(b.id)}
-                      disabled={submittingRating}
-                    >
-                      {submittingRating ? "Submitting..." : "Submit Rating"}
-                    </button>
-                    <button
-                      className="cancel-rating-btn"
-                      onClick={() => {
-                        setRatingBookingId(null);
-                        setRatingData({ stars: 5, review: "" });
+                <div className="provider-info">
+                  {b.providerProfileImage && (
+                    <img
+                      src={b.providerProfileImage}
+                      alt="Provider"
+                      className="provider-avatar"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.onerror = null;
                       }}
-                    >
-                      Cancel
-                    </button>
+                    />
+                  )}
+                  <div>
+                    <p><FaUserTie /> Provider: {b.providerName || `ID: ${b.providerId}`}</p>
                   </div>
                 </div>
-              )}
-            </div>
-          ))
-        )}
+                {b.providerPhone && <p>📱 Phone: {b.providerPhone}</p>}
+                {b.providerEmail && <p>✉️ Email: {b.providerEmail}</p>}
+                <p><FaCalendarAlt /> Date: {b.date}</p>
+                <p><FaClock /> Time: {b.time}</p>
+                {b.totalAmount && <p>💰 Amount: ₹{b.totalAmount}</p>}
+
+                {b.status === "Pending" && (
+                  <button
+                    className="cancel-btn"
+                    onClick={() => cancelBooking(b.id)}
+                  >
+                    <FaTimesCircle /> Cancel Booking
+                  </button>
+                )}
+
+                {(b.status === "Accepted" || b.status === "Confirmed" || b.status === "En Route" || b.status === "In Progress") && (
+                  <button
+                    className="track-btn"
+                    onClick={() => setTrackingBooking(b)}
+                  >
+                    <FaMapMarkerAlt /> Track Service
+                  </button>
+                )}
+
+                {b.status === "Completed" && ratingBookingId !== b.id && (
+                  <button
+                    className="rate-btn"
+                    onClick={() => setRatingBookingId(b.id)}
+                  >
+                    <FaStar /> Rate Service
+                  </button>
+                )}
+
+                {b.status === "Completed" && ratingBookingId === b.id && (
+                  <div className="rating-form">
+                    <div className="rating-section">
+                      <label>Rating:</label>
+                      <div className="star-rating">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            className={`star ${star <= ratingData.stars ? 'active' : ''}`}
+                            onClick={() => setRatingData({ ...ratingData, stars: star })}
+                          >
+                            ★
+                          </button>
+                        ))}
+                      </div>
+                      <span className="rating-text">{ratingData.stars}/5</span>
+                    </div>
+
+                    <textarea
+                      className="review-textarea"
+                      placeholder="Share your experience with this service..."
+                      value={ratingData.review}
+                      onChange={(e) => setRatingData({ ...ratingData, review: e.target.value })}
+                      rows="3"
+                    />
+
+                    <div className="rating-actions">
+                      <button
+                        className="submit-rating-btn"
+                        onClick={() => submitRating(b.id)}
+                        disabled={submittingRating}
+                      >
+                        {submittingRating ? "Submitting..." : "Submit Rating"}
+                      </button>
+                      <button
+                        className="cancel-rating-btn"
+                        onClick={() => {
+                          setRatingBookingId(null);
+                          setRatingData({ stars: 5, review: "" });
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
         </div>
       )}
 
@@ -234,7 +234,7 @@ export default function CustomerBookings() {
               <h3>Track Service: {trackingBooking.serviceName}</h3>
               <button className="close-modal" onClick={() => setTrackingBooking(null)}>✕</button>
             </div>
-            
+
             <div className="tracking-content">
               <div className="tracking-status-flow">
                 <div className={`status-step ${['Accepted', 'Confirmed', 'En Route', 'In Progress', 'Completed'].includes(trackingBooking.status) ? 'completed' : ''}`}>
@@ -242,19 +242,19 @@ export default function CustomerBookings() {
                   <div className="step-label">Booking Confirmed</div>
                   <div className="step-time">{trackingBooking.acceptedAt ? new Date(trackingBooking.acceptedAt).toLocaleTimeString() : ''}</div>
                 </div>
-                
+
                 <div className={`status-step ${['En Route', 'In Progress', 'Completed'].includes(trackingBooking.status) ? 'completed' : ''} ${trackingBooking.status === 'En Route' ? 'active' : ''}`}>
                   <div className="step-icon"><FaTruck /></div>
                   <div className="step-label">Provider En Route</div>
                   <div className="step-time">{trackingBooking.enRouteAt ? new Date(trackingBooking.enRouteAt).toLocaleTimeString() : ''}</div>
                 </div>
-                
+
                 <div className={`status-step ${['In Progress', 'Completed'].includes(trackingBooking.status) ? 'completed' : ''} ${trackingBooking.status === 'In Progress' ? 'active' : ''}`}>
                   <div className="step-icon"><FaTools /></div>
                   <div className="step-label">Service In Progress</div>
                   <div className="step-time">{trackingBooking.inProgressAt ? new Date(trackingBooking.inProgressAt).toLocaleTimeString() : ''}</div>
                 </div>
-                
+
                 <div className={`status-step ${trackingBooking.status === 'Completed' ? 'completed' : ''}`}>
                   <div className="step-icon"><FaCheckCircle /></div>
                   <div className="step-label">Completed</div>
@@ -265,17 +265,17 @@ export default function CustomerBookings() {
               <div className="provider-tracking-info">
                 <h4>Service Provider</h4>
                 <div className="tracking-provider-card">
-                   {trackingBooking.providerProfileImage && (
+                  {trackingBooking.providerProfileImage && (
                     <img src={trackingBooking.providerProfileImage} alt="Provider" className="tracking-avatar" />
-                   )}
-                   <div className="tracking-provider-details">
-                      <p><strong>{trackingBooking.providerName}</strong></p>
-                      <p>📱 {trackingBooking.providerPhone}</p>
-                      <div className="status-live-indicator">
-                        <span className="pulse"></span>
-                        Status: {trackingBooking.status}
-                      </div>
-                   </div>
+                  )}
+                  <div className="tracking-provider-details">
+                    <p><strong>{trackingBooking.providerName}</strong></p>
+                    <p>📱 {trackingBooking.providerPhone}</p>
+                    <div className="status-live-indicator">
+                      <span className="pulse"></span>
+                      Status: {trackingBooking.status}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

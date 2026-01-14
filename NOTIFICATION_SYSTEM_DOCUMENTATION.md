@@ -271,7 +271,7 @@ stompClient.subscribe(
 |------|-----------|---------|----------|
 | `BOOKING_CREATED` | Provider | Customer creates booking | HIGH |
 | `BOOKING_CONFIRMED` | Customer | Provider confirms | HIGH |
-| `BOOKING_CANCELLED` | Both | Either cancels | HIGH |
+| `BOOKING_CANCELLED` | **Both customer & provider** | Either cancels | HIGH |
 | `BOOKING_COMPLETED` | Customer | Provider marks complete | NORMAL |
 
 ### Review Notifications
@@ -410,6 +410,73 @@ curl -X POST http://localhost:8080/api/notifications \
 1. Backend WebSocket endpoint is accessible at `/ws-notifications`
 2. CORS configuration in `WebSocketConfig` includes frontend URL
 3. Java version matches environment (Project uses Java 21)
+
+---
+
+## 🐛 Bug Fixes
+
+### Cancellation Notification Attribution (Fixed: January 14, 2026)
+
+**Issue:** When a provider cancelled a booking, the notification incorrectly showed the customer's name as the canceller (e.g., "Henry cancelled" when Shilpa cancelled).
+
+**Root Cause:** The `cancelBooking()` endpoint didn't track who initiated the cancellation. The backend always assumed the customer cancelled and used the customer's name in all cancellation notifications.
+
+**Fix:** Added `cancelledBy` request parameter to the endpoint:
+
+```java
+// Backend - BookingController.java
+@PutMapping("/cancel/{id}")
+public ResponseEntity<?> cancelBooking(
+        @PathVariable Long id,
+        @RequestBody(required = false) Map<String, String> body) {
+    
+    String cancelledBy = (body != null && body.get("cancelledBy") != null) 
+            ? body.get("cancelledBy").toUpperCase() 
+            : "CUSTOMER";
+    
+    if ("PROVIDER".equals(cancelledBy)) {
+        // Provider cancelled - notify customer with provider's name
+    } else {
+        // Customer cancelled - notify provider with customer's name
+    }
+}
+```
+
+**Frontend Updates:**
+- `ProviderDashboard.jsx` sends `{ cancelledBy: "PROVIDER" }`
+- `ProviderBookings.jsx` sends `{ cancelledBy: "PROVIDER" }`
+- `CustomerBookings.jsx` sends `{ cancelledBy: "CUSTOMER" }`
+
+**Impact:** Cancellation notifications now correctly identify who initiated the cancellation.
+
+---
+
+### Cancellation Notification Missing (Fixed: January 14, 2026)
+
+**Issue:** When a provider cancelled a booking, the customer did not receive a notification.
+
+**Root Cause:** The `cancelBooking()` method in `BookingController.java` (lines 348-364) had a logically unreachable `else if` condition:
+```java
+// BEFORE (BUG)
+if (customer != null) {
+    // Notify provider ✓
+} else if (provider != null && customer != null) {  // UNREACHABLE!
+    // Notify customer ✗ NEVER EXECUTED
+}
+```
+
+**Fix:** Changed to notify BOTH customer AND provider:
+```java
+// AFTER (FIXED)
+if (customer != null) {
+    // Notify customer ✓
+}
+if (provider != null) {
+    // Notify provider ✓
+}
+```
+
+**Impact:** Both customers and providers now receive cancellation notifications regardless of who initiated the cancellation.
 
 ---
 

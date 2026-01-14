@@ -8,7 +8,7 @@ import axios from "axios";
 export default function ProviderDashboard() {
   const navigate = useNavigate();
   const providerId = localStorage.getItem("providerId");
-  
+
   const [provider, setProvider] = useState(null);
   const [services, setServices] = useState([]);
   const [bookings, setBookings] = useState([]);
@@ -25,7 +25,7 @@ export default function ProviderDashboard() {
     state: "",
     pincode: ""
   });
-  
+
   const [newService, setNewService] = useState({
     name: "",
     description: "",
@@ -51,12 +51,12 @@ export default function ProviderDashboard() {
         `http://localhost:8080/api/services/provider/${providerId}`
       );
       setServices(servicesRes.data);
-      
+
       const bookingsRes = await axios.get(
         `http://localhost:8080/booking/provider/${providerId}`
       );
       setBookings(Array.isArray(bookingsRes.data) ? bookingsRes.data.slice(0, 5) : []);
-      
+
       const myBookingsRes = await axios.get(
         `http://localhost:8080/booking/provider-made/${providerId}`
       );
@@ -123,8 +123,8 @@ export default function ProviderDashboard() {
   const handleAddService = async (e) => {
     e.preventDefault();
 
-    if (!newService.name || !newService.description || !newService.categoryId || 
-        !newService.price || !newService.city || !newService.state || !newService.pincode) {
+    if (!newService.name || !newService.description || !newService.categoryId ||
+      !newService.price || !newService.city || !newService.state || !newService.pincode) {
       alert("Please fill all fields");
       return;
     }
@@ -191,7 +191,7 @@ export default function ProviderDashboard() {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!editFormData.name || !editFormData.description || !editFormData.price) {
       alert("Please fill all required fields");
       return;
@@ -210,7 +210,7 @@ export default function ProviderDashboard() {
         provider: { id: providerId },
         isActive: service.isActive
       };
-      
+
       await axios.put(`http://localhost:8080/api/services/${editingService}`, updateData);
       alert("Service updated successfully!");
       setEditingService(null);
@@ -251,7 +251,7 @@ export default function ProviderDashboard() {
     if (!confirm) return;
 
     try {
-      await axios.put(`http://localhost:8080/booking/cancel/${bookingId}`);
+      await axios.put(`http://localhost:8080/booking/cancel/${bookingId}`, { cancelledBy: "PROVIDER" });
       alert("Booking Rejected!");
       fetchProviderData();
     } catch (error) {
@@ -354,7 +354,7 @@ export default function ProviderDashboard() {
       <div className="booking-requests-section">
         <div className="section-header">
           <h2>Recent Booking Requests ({bookings.length})</h2>
-          <button 
+          <button
             className="view-all-btn"
             onClick={() => navigate("/provider-bookings")}
           >
@@ -393,13 +393,13 @@ export default function ProviderDashboard() {
                 </div>
                 {booking.status === "Pending" && (
                   <div className="booking-actions">
-                    <button 
+                    <button
                       className="accept-mini-btn"
                       onClick={() => handleAcceptBooking(booking.id)}
                     >
                       Accept
                     </button>
-                    <button 
+                    <button
                       className="reject-mini-btn"
                       onClick={() => handleRejectBooking(booking.id)}
                     >
@@ -409,7 +409,7 @@ export default function ProviderDashboard() {
                 )}
                 {(booking.status === "Accepted" || booking.status === "Confirmed") && (
                   <div className="booking-actions">
-                    <button 
+                    <button
                       className="enroute-mini-btn"
                       onClick={() => handleUpdateBookingStatus(booking.id, "En Route")}
                     >
@@ -419,7 +419,7 @@ export default function ProviderDashboard() {
                 )}
                 {booking.status === "En Route" && (
                   <div className="booking-actions">
-                    <button 
+                    <button
                       className="inprogress-mini-btn"
                       onClick={() => handleUpdateBookingStatus(booking.id, "In Progress")}
                     >
@@ -429,7 +429,7 @@ export default function ProviderDashboard() {
                 )}
                 {(booking.status === "Accepted" || booking.status === "Confirmed" || booking.status === "In Progress") && (
                   <div className="booking-actions">
-                    <button 
+                    <button
                       className="complete-mini-btn"
                       onClick={() => handleCompleteBooking(booking.id)}
                     >
@@ -496,7 +496,7 @@ export default function ProviderDashboard() {
       <div className="services-section">
         <div className="section-header">
           <h2>My Services ({services.length})</h2>
-          <button 
+          <button
             className="add-service-btn"
             onClick={() => setShowAddServiceForm(!showAddServiceForm)}
           >
@@ -510,8 +510,8 @@ export default function ProviderDashboard() {
             <div className="category-modal">
               <div className="modal-header">
                 <h3>Create New Category</h3>
-                <button 
-                  className="close-btn" 
+                <button
+                  className="close-btn"
                   onClick={() => setShowNewCategoryForm(false)}
                 >
                   ✕
@@ -539,8 +539,8 @@ export default function ProviderDashboard() {
                 </div>
                 <div className="modal-actions">
                   <button type="submit" className="save-btn">Create Category</button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="cancel-btn"
                     onClick={() => setShowNewCategoryForm(false)}
                   >
@@ -725,7 +725,7 @@ export default function ProviderDashboard() {
                 </div>
 
                 <div className="rating">
-                  <FaStar color="#FFD700" /> 
+                  <FaStar color="#FFD700" />
                   <span>{service.rating?.toFixed(1) || "N/A"} ({service.reviewCount || 0})</span>
                 </div>
 
@@ -733,7 +733,7 @@ export default function ProviderDashboard() {
                   <button className="edit-btn" onClick={() => handleEditClick(service)}>
                     <FaEdit /> Edit
                   </button>
-                  <button 
+                  <button
                     className="delete-btn"
                     onClick={() => handleDeleteService(service.id)}
                   >

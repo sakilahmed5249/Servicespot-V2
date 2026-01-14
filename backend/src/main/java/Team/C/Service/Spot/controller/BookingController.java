@@ -334,7 +334,9 @@ public class BookingController {
     }
 
     @PutMapping("/cancel/{id}")
-    public ResponseEntity<?> cancelBooking(@PathVariable Long id) {
+    public ResponseEntity<?> cancelBooking(
+            @PathVariable Long id,
+            @RequestBody(required = false) Map<String, String> body) {
         Optional<Booking> existingBooking = bookingService.getBookingById(id);
         if (!existingBooking.isPresent()) {
             return ResponseEntity.notFound().build();
@@ -343,24 +345,57 @@ public class BookingController {
         Booking booking = existingBooking.get();
         Booking cancelled = bookingService.cancelBooking(id);
 
+        // Determine who cancelled (default to CUSTOMER if not specified)
+        String cancelledBy = (body != null && body.get("cancelledBy") != null)
+                ? body.get("cancelledBy").toUpperCase()
+                : "CUSTOMER";
+
         if (cancelled != null) {
-            // Notify the other party about cancellation
-            if (booking.getCustomer() != null) {
-                // Notify provider about customer cancellation
-                notificationService.notifyBookingCancelled(
-                        booking.getProvider().getEmail(),
-                        "SERVICE_PROVIDER",
-                        booking.getCustomer().getName(),
-                        booking.getId(),
-                        booking.getServiceName());
-            } else if (booking.getProvider() != null && booking.getCustomer() != null) {
-                // Notify customer about provider cancellation
-                notificationService.notifyBookingCancelled(
-                        booking.getCustomer().getEmail(),
-                        "CUSTOMER",
-                        booking.getProvider().getName(),
-                        booking.getId(),
-                        booking.getServiceName());
+            String customerName = booking.getCustomer() != null
+                    ? booking.getCustomer().getName()
+                    : "Customer";
+            String providerName = booking.getProvider() != null
+                    ? booking.getProvider().getName()
+                    : "Provider";
+
+            if ("PROVIDER".equals(cancelledBy)) {
+                // Provider cancelled - notify customer that provider cancelled
+                if (booking.getCustomer() != null) {
+                    notificationService.notifyBookingCancelled(
+                            booking.getCustomer().getEmail(),
+                            "CUSTOMER",
+                            providerName, // Provider's name as canceller
+                            booking.getId(),
+                            booking.getServiceName());
+                }
+                // Also notify provider (confirmation of their action)
+                if (booking.getProvider() != null) {
+                    notificationService.notifyBookingCancelled(
+                            booking.getProvider().getEmail(),
+                            "SERVICE_PROVIDER",
+                            "You", // Self-cancelled
+                            booking.getId(),
+                            booking.getServiceName());
+                }
+            } else {
+                // Customer cancelled - notify provider that customer cancelled
+                if (booking.getProvider() != null) {
+                    notificationService.notifyBookingCancelled(
+                            booking.getProvider().getEmail(),
+                            "SERVICE_PROVIDER",
+                            customerName, // Customer's name as canceller
+                            booking.getId(),
+                            booking.getServiceName());
+                }
+                // Also notify customer (confirmation of their action)
+                if (booking.getCustomer() != null) {
+                    notificationService.notifyBookingCancelled(
+                            booking.getCustomer().getEmail(),
+                            "CUSTOMER",
+                            "You", // Self-cancelled
+                            booking.getId(),
+                            booking.getServiceName());
+                }
             }
 
             return ResponseEntity.ok(convertToDTO(cancelled));

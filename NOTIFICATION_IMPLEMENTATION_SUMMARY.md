@@ -46,7 +46,8 @@
    - Integrated notification sending in:
      - `createBooking()` - Notifies provider
      - `updateBooking()` - Notifies on status change
-     - `cancelBooking()` - Notifies affected party
+     - `cancelBooking()` - Notifies **both customer and provider** (Bug fixed: Jan 14, 2026)
+       - Added `cancelledBy` parameter to correctly attribute canceller (Bug fixed: Jan 14, 2026)
      - `completeBooking()` - Notifies customer
 
 3. **RatingController.java**
@@ -85,6 +86,15 @@
 4. **BookService.jsx**
    - Added Customer Reviews display section
    - Added "Amazon-style" review cards (Name, Rating, Comment, Date)
+
+5. **ProviderDashboard.jsx** (Updated: Jan 14, 2026)
+   - Sends `cancelledBy: "PROVIDER"` when cancelling bookings
+
+6. **ProviderBookings.jsx** (Updated: Jan 14, 2026)
+   - Sends `cancelledBy: "PROVIDER"` when rejecting bookings
+
+7. **CustomerBookings.jsx** (Updated: Jan 14, 2026)
+   - Sends `cancelledBy: "CUSTOMER"` when cancelling bookings
 
 ---
 
@@ -172,7 +182,7 @@ CREATE TABLE notifications (
 ### Integration Features
 - ✅ Booking created → Provider notification
 - ✅ Booking confirmed → Customer notification
-- ✅ Booking cancelled → Affected party notification
+- ✅ Booking cancelled → **Both customer and provider** notification
 - ✅ Booking completed → Customer notification
 - ✅ Review received → Provider notification
 - ✅ New customer registered → Admin notification
@@ -187,7 +197,7 @@ CREATE TABLE notifications (
 |------|---------------|-----------|----------|
 | `BOOKING_CREATED` | Customer creates booking | Provider | HIGH |
 | `BOOKING_CONFIRMED` | Provider confirms booking | Customer | HIGH |
-| `BOOKING_CANCELLED` | Either party cancels | Other party | HIGH |
+| `BOOKING_CANCELLED` | Either party cancels | **Both customer & provider** | HIGH |
 | `BOOKING_COMPLETED` | Provider marks complete | Customer | NORMAL |
 | `REVIEW_RECEIVED` | Customer leaves review | Provider | NORMAL |
 | `NEW_CUSTOMER_REGISTERED` | Customer signs up | Admin | NORMAL |
@@ -454,3 +464,37 @@ To extend the notification system:
 ✅ **Review Integration** - Real-time review alerts  
 
 **The notification system is fully operational and ready for use!** 🚀
+
+---
+
+## 🐛 Bug Fixes
+
+### 1. Cancellation Notification Attribution (Fixed: January 14, 2026)
+
+**Issue:** Cancellation notifications showed incorrect canceller name  
+**Example:** "Henry cancelled" when Shilpa (provider) actually cancelled
+
+**Solution:**
+- Added `cancelledBy` parameter to `POST /booking/cancel/{id}` endpoint
+- Frontend sends `"PROVIDER"` or `"CUSTOMER"` based on who cancels
+- Backend uses this to send correct notification messages
+
+**Files Modified:**
+- Backend: `BookingController.java`
+- Frontend: `ProviderDashboard.jsx`, `ProviderBookings.jsx`, `CustomerBookings.jsx`
+
+### 2. Missing Customer Cancellation Notification (Fixed: January 14, 2026)
+
+**Issue:** Customer didn't receive notification when provider cancelled  
+**Cause:** Logically unreachable `else if` condition in `BookingController.cancelBooking()`
+
+**Solution:**
+- Changed from `if-else if` to separate `if` blocks
+- Both customer and provider now receive notifications
+
+**Files Modified:**
+- Backend: `BookingController.java` (lines 346-397)
+
+---
+
+## ✅ Implementation Status

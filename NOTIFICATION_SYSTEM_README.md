@@ -150,7 +150,7 @@ curl -X POST http://localhost:8080/api/notifications \
 |------|---------|-----------|----------|
 | `BOOKING_CREATED` | Customer books service | Provider | HIGH |
 | `BOOKING_CONFIRMED` | Provider confirms | Customer | HIGH |
-| `BOOKING_CANCELLED` | Either cancels | Other party | HIGH |
+| `BOOKING_CANCELLED` | Either cancels | **Both parties** | HIGH |
 | `BOOKING_COMPLETED` | Service completed | Customer | NORMAL |
 | `REVIEW_RECEIVED` | Review submitted | Provider | NORMAL |
 | `NEW_CUSTOMER_REGISTERED` | Customer signs up | Admin | NORMAL |
@@ -270,7 +270,7 @@ frontend/src/
 ### Integrations
 - [x] Booking created → Notify provider
 - [x] Booking confirmed → Notify customer
-- [x] Booking cancelled → Notify affected party
+- [x] Booking cancelled → Notify **both customer and provider**
 - [x] Booking completed → Notify customer
 - [x] Review received → Notify provider
 - [x] Customer registered → Notify admin
